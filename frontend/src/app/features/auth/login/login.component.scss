@@ -1,0 +1,89 @@
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+
+  // Background image is set via [style.background-image] binding from environment.authBgUrl
+  background-color: #1a0a08; // fallback when no image is configured
+  background-size: cover;
+  background-position: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 0;
+  }
+}
+
+.auth-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: 32px 32px 8px;
+}
+
+.app-title {
+  font-size: 3rem;
+  letter-spacing: 0.25em;
+  color: var(--rp-accent);
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.card-heading {
+  font-size: 1.3rem;
+  color: var(--rp-text-primary);
+  margin-bottom: 16px;
+}
+
+.full-width {
+  width: 100%;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  margin-top: 12px;
+  background-color: var(--rp-accent) !important;
+  color: #fff !important;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+
+  &[disabled] {
+    opacity: 0.7;
+  }
+}
+
+.btn-spinner {
+  --mdc-circular-progress-active-indicator-color: #fff;
+}
+
+.auth-footer {
+  padding: 16px 0 8px;
+  text-align: center;
+  border-top: 1px solid var(--rp-border);
+  margin-top: 8px;
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--rp-text-muted);
+  }
+
+  a {
+    color: var(--rp-accent);
+    font-weight: 500;
+  }
+}
