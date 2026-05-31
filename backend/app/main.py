@@ -1,6 +1,12 @@
 from fastapi import FastAPI
+from app.routers import users, sessions, analytics
 
 app = FastAPI()
+
+app.include_router(sessions.router)
+app.include_router(users.router)
+app.include_router(analytics.router)
+
 
 @app.get("/")
 def read_root():
