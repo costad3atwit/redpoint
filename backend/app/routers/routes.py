@@ -7,7 +7,6 @@ from app.models.sessions import Session as TrainingSession
 from app.schemas.schema import routeCreate, routeResponse
 
 router = APIRouter(
-    prefix="/routes",
     tags=["routes"],
 )
 
@@ -22,11 +21,11 @@ def create_route(session_id: int, route_data: routeCreate, db: DBSession = Depen
     db.refresh(route)
     return route
 
-@router.get("/session/{session_id}/routes", response_model=list[routeResponse])
+@router.get("/sessions/{session_id}/routes", response_model=list[routeResponse])
 def get_routes_for_session(session_id: int, db: DBSession = Depends(get_db)):
     return db.query(Route).filter(Route.session_id == session_id).all()
 
-@router.get("/{route_id}", response_model=routeResponse)
+@router.get("/routes/{route_id}", response_model=routeResponse)
 def get_route(route_id: int, db: DBSession = Depends(get_db)):
     route = db.query(Route).filter(Route.id == route_id).first()
     if not route:
