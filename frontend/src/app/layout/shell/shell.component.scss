@@ -1,0 +1,114 @@
+.shell-wrapper {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--rp-bg);
+}
+
+// Sidebar (desktop)
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--rp-surface);
+  border-right: 1px solid var(--rp-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--rp-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.app-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: 0.2em;
+  color: var(--rp-accent);
+}
+
+.log-session-btn {
+  background-color: var(--rp-accent) !important;
+  color: #fff !important;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.08em;
+  width: 100%;
+}
+
+// Nav list active state
+::ng-deep {
+  .rp-nav-active {
+    background-color: rgba(192, 57, 43, 0.12) !important;
+
+    .mdc-list-item__primary-text,
+    .mat-icon {
+      color: var(--rp-accent) !important;
+    }
+  }
+}
+
+// Main content area
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+
+  &--mobile {
+    padding-bottom: 72px; // clear the bottom nav
+  }
+}
+
+// Bottom nav (mobile)
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--rp-surface);
+  border-top: 1px solid var(--rp-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--rp-text-muted);
+  font-size: 0.625rem;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.02em;
+  padding: 4px 12px;
+  border-radius: 8px;
+  transition: color 0.2s;
+
+  mat-icon {
+    font-size: 22px;
+    height: 22px;
+    width: 22px;
+  }
+
+  &.active {
+    color: var(--rp-accent);
+  }
+}
+
+// Quick-log FAB (mobile)
+.quick-log-fab {
+  position: fixed;
+  bottom: 72px;
+  right: 16px;
+  z-index: 200;
+  background-color: var(--rp-accent) !important;
+  color: #fff !important;
+}
