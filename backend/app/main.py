@@ -1,5 +1,12 @@
 from fastapi import FastAPI
 from app.routers import users, sessions, analytics
+from app.database import Base, engine
+
+Base.metadata.create_all(bind=engine)
+
+import app.models.users
+import app.models.sessions
+import app.models.routes
 
 app = FastAPI()
 
