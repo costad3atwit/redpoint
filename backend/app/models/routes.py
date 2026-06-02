@@ -1,60 +1,17 @@
-from sqlalchemy import ARRAY, Boolean, Column, Enum, Integer, String, DateTime, Date, ForeignKey, Text
-from sqlalchemy.sql import func
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY
+from sqlalchemy.orm import relationship
+from app.database import Base
 
-import enum
-
-from app.db.database import Base
-
-class SendType(str, enum.Enum):
-    onsight = "onsight"
-    flash = "flash"
-    send = "send"
-    attempt = "attempt"
-    redpoint = "redpoint"
-
-class Routes(Base):
+class Route(Base):
     __tablename__ = "routes"
 
-    id = Column(
-        Integer,
-        primary_key=True,
-        index=True
-    )
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(Integer, ForeignKey("sessions.id", ondelete="CASCADE"), nullable=False)
+    grade = Column(String, nullable=False) 
+    wall_angle = Column(String, nullable=True) 
+    sent = Column(Boolean, default=False)
+    send_type = Column(String, nullable=True) 
+    attempts = Column(Integer, default=1)
+    style_tags = Column(ARRAY(String), nullable=True)
 
-    session_id = Column(
-        Integer,
-        ForeignKey("sessions.id"),
-        nullable=False
-    )
-
-    grade = Column(
-        String,
-        nullable=False
-    )
-
-    style_tags = Column(
-        ARRAY(String),
-        nullable=True
-    )
-
-    wall_angle = Column(
-        Integer,
-        nullable=True
-    )
-
-    sent = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
-
-    send_type = Column(
-        Enum(SendType),
-        nullable=True
-    )
-
-    attempts = Column(
-        Integer,
-        nullable=True
-    )
-    
+    session = relationship("Session", back_populates="routes")
