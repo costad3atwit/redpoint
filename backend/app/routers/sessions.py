@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session as DBSession
 
@@ -26,7 +27,7 @@ def get_sessions(db: DBSession = Depends(get_db)):
 
 #Read single session
 @router.get("/{session_id}", response_model=sessionResponse)
-def get_session(session_id: int, db: DBSession = Depends(get_db)):
+def get_session(session_id: UUID, db: DBSession = Depends(get_db)):
     session = db.query(TrainingSession).filter(TrainingSession.id == session_id).first()
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -34,7 +35,7 @@ def get_session(session_id: int, db: DBSession = Depends(get_db)):
 
 #Update
 @router.put("/{session_id}", response_model=sessionResponse)
-def update_session(session_id: int, session_data: sessionCreate, db: DBSession = Depends(get_db)):
+def update_session(session_id: UUID, session_data: sessionCreate, db: DBSession = Depends(get_db)):
     session = db.query(TrainingSession).filter(TrainingSession.id == session_id).first()
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -46,7 +47,7 @@ def update_session(session_id: int, session_data: sessionCreate, db: DBSession =
 
 #Delete
 @router.delete("/{session_id}")
-def delete_session(session_id: int, db: DBSession = Depends(get_db)):
+def delete_session(session_id: UUID, db: DBSession = Depends(get_db)):
     session = db.query(TrainingSession).filter(TrainingSession.id == session_id).first()
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")

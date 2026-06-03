@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session as DBSession
 
@@ -11,7 +12,7 @@ router = APIRouter(
 )
 
 @router.post("/sessions/{session_id}/routes", response_model=routeResponse)
-def create_route(session_id: int, route_data: routeCreate, db: DBSession = Depends(get_db)):
+def create_route(session_id: UUID, route_data: routeCreate, db: DBSession = Depends(get_db)):
     session = db.query(TrainingSession).filter(TrainingSession.id == session_id).first()
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -22,18 +23,18 @@ def create_route(session_id: int, route_data: routeCreate, db: DBSession = Depen
     return route
 
 @router.get("/sessions/{session_id}/routes", response_model=list[routeResponse])
-def get_routes_for_session(session_id: int, db: DBSession = Depends(get_db)):
+def get_routes_for_session(session_id: UUID, db: DBSession = Depends(get_db)):
     return db.query(Route).filter(Route.session_id == session_id).all()
 
 @router.get("/routes/{route_id}", response_model=routeResponse)
-def get_route(route_id: int, db: DBSession = Depends(get_db)):
+def get_route(route_id: UUID, db: DBSession = Depends(get_db)):
     route = db.query(Route).filter(Route.id == route_id).first()
     if not route:
         raise HTTPException(status_code=404, detail="Route not found")
     return route
 
 @router.put("/routes/{route_id}", response_model=routeResponse)
-def update_route(route_id: int, route_data: routeCreate, db: DBSession = Depends(get_db)):
+def update_route(route_id: UUID, route_data: routeCreate, db: DBSession = Depends(get_db)):
     route = db.query(Route).filter(Route.id == route_id).first()
     if not route:
         raise HTTPException(status_code=404, detail="Route not found")
@@ -44,7 +45,7 @@ def update_route(route_id: int, route_data: routeCreate, db: DBSession = Depends
     return route
 
 @router.delete("/routes/{route_id}")
-def delete_route(route_id: int, db: DBSession = Depends(get_db)):
+def delete_route(route_id: UUID, db: DBSession = Depends(get_db)):
     route = db.query(Route).filter(Route.id == route_id).first()
     if not route:
         raise HTTPException(status_code=404, detail="Route not found")
