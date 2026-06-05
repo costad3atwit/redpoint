@@ -1,0 +1,42 @@
+<div class="auth-page" [style.background-image]="bgImageUrl ? 'url(' + bgImageUrl + ')' : null">
+  <mat-card class="auth-wrapper">
+    <h1 class="app-title">REDPOINT</h1>
+
+    <mat-card-content>
+      <h2 class="card-heading">Log In</h2>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email" />
+          @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
+            <mat-error>Email is required</mat-error>
+          }
+          @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+            <mat-error>Enter a valid email address</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" autocomplete="current-password" />
+          @if (form.get('password')?.hasError('required') && form.get('password')?.touched) {
+            <mat-error>Password is required</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button type="submit" class="submit-btn" [disabled]="loading()">
+          @if (loading()) {
+            <mat-spinner diameter="20" class="btn-spinner" />
+          } @else {
+            Log In
+          }
+        </button>
+      </form>
+    </mat-card-content>
+
+    <div class="auth-footer">
+      <p>Don't have an account?&nbsp;<a routerLink="/register">Register</a></p>
+    </div>
+  </mat-card>
+</div>

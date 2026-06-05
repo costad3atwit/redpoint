@@ -1,6 +1,20 @@
 from fastapi import FastAPI
+from app.routers import users, sessions, analytics, routes
+from app.database import Base, engine
+
+import app.models.users
+import app.models.sessions
+import app.models.routes
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.include_router(sessions.router)
+app.include_router(users.router)
+app.include_router(analytics.router)
+app.include_router(routes.router)
+
 
 @app.get("/")
 def read_root():
@@ -8,16 +22,4 @@ def read_root():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
-
-@app.get("/acwr")
-def acwr():
-    return {"status": "ok"}
-
-@app.get("/plateau_detector")
-def plateau_detector():
-    return {"status": "ok"}
-
-@app.get("/training_recommender")
-def training_recommender():
     return {"status": "ok"}

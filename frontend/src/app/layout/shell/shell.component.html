@@ -1,0 +1,43 @@
+<div class="shell-wrapper">
+  @if (isDesktop()) {
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="app-name">REDPOINT</span>
+        <a mat-flat-button routerLink="/sessions/new" class="log-session-btn">
+          <mat-icon>add</mat-icon>
+          Log Session
+        </a>
+      </div>
+      <nav>
+        <mat-nav-list>
+          @for (item of navItems; track item.route) {
+            <a mat-list-item [routerLink]="item.route" routerLinkActive="rp-nav-active">
+              <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+              <span matListItemTitle>{{ item.label }}</span>
+            </a>
+          }
+        </mat-nav-list>
+      </nav>
+    </aside>
+  }
+
+  <main [class]="isDesktop() ? 'main-content' : 'main-content main-content--mobile'">
+    <router-outlet />
+  </main>
+
+  @if (!isDesktop()) {
+    <nav class="bottom-nav">
+      @for (item of navItems; track item.route) {
+        <a class="bottom-nav-item" [routerLink]="item.route" routerLinkActive="active">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <a mat-fab extended routerLink="/sessions/new" class="quick-log-fab">
+      <mat-icon>add</mat-icon>
+      Log Session
+    </a>
+  }
+</div>
