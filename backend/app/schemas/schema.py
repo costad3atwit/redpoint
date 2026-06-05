@@ -5,15 +5,20 @@ from uuid import UUID
 
 #user schemas
 class userCreate(BaseModel):
+    username: str
     email: EmailStr
     password: str
 
 class userResponse(BaseModel):
     id: UUID
+    username: str
     email: EmailStr
     created_at: datetime
     class Config:
         from_attributes = True
+
+class userProfileResponse(userResponse):
+    sessions_logged: int
 
 #session schemas
 class sessionCreate(BaseModel):
