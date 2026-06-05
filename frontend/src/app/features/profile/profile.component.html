@@ -1,0 +1,112 @@
+<div class="profile-page">
+
+  <!-- Profile Header -->
+  @if (profile(); as p) {
+    <mat-card class="profile-header-card">
+      <mat-card-content>
+        <div class="header-content">
+          <mat-icon class="profile-avatar">account_circle</mat-icon>
+          <div class="identity">
+            <h2 class="display-name">{{ displayName() }}</h2>
+            <p class="email">{{ p.email }}</p>
+            <p class="since">Member since {{ p.createdAt | date:'MMMM yyyy' }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Stats -->
+  @if (stats(); as s) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Your Stats</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-value">{{ s.totalSessions }}</span>
+            <span class="stat-label">Sessions</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ s.totalRoutesSent }}</span>
+            <span class="stat-label">Routes Sent</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ s.topGradeSent }}</span>
+            <span class="stat-label">Top Grade</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Account Details -->
+  @if (profile(); as p) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Account Details</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="detail-row">
+          <div class="detail-info">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">{{ p.email }}</span>
+          </div>
+          <button mat-stroked-button (click)="openChangeEmail()">Change</button>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="detail-row">
+          <div class="detail-info">
+            <span class="detail-label">Username</span>
+            <!-- TODO (Shayne): display p.username once backend adds the field -->
+            <span class="detail-value detail-muted">{{ p.username ?? '— pending backend support' }}</span>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="detail-row">
+          <div class="detail-info">
+            <span class="detail-label">User ID</span>
+            <span class="detail-value detail-muted">#{{ p.id }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Security -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Security</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="detail-row">
+        <div class="detail-info">
+          <span class="detail-label">Password</span>
+          <span class="detail-value">••••••••</span>
+        </div>
+        <button mat-stroked-button (click)="openChangePassword()">Change</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Account Actions -->
+  <mat-card class="danger-card">
+    <mat-card-header>
+      <mat-card-title>Account Actions</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="actions-row">
+        <button mat-stroked-button (click)="signOut()">
+          <mat-icon>logout</mat-icon>
+          Sign Out
+        </button>
+        <button mat-flat-button class="delete-btn" (click)="openDeleteAccount()">
+          <mat-icon>delete_forever</mat-icon>
+          Delete Account
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+</div>
