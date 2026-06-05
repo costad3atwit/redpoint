@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional, List
+from uuid import UUID
 
 #user schemas
 class userCreate(BaseModel):
@@ -8,7 +9,7 @@ class userCreate(BaseModel):
     password: str
 
 class userResponse(BaseModel):
-    id: int
+    id: UUID
     email: EmailStr
     created_at: datetime
     class Config:
@@ -22,8 +23,8 @@ class sessionCreate(BaseModel):
     notes: Optional[str] = None
 
 class sessionResponse(BaseModel):
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     date: datetime
     duration_minutes: int
     rpe: int
@@ -42,8 +43,20 @@ class routeCreate(BaseModel):
     style_tags: Optional[List[str]] = None
 
 class routeResponse(routeCreate):
-    id: int
-    session_id: int
+    id: UUID
+    session_id: UUID
     class Config:
         from_attributes = True
     
+#attempt schemas
+class attemptCreate(BaseModel):
+    success: bool = False
+    notes: Optional[str] = None
+
+class attemptResponse(attemptCreate):
+    id: UUID
+    route_id: UUID
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
