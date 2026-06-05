@@ -1,35 +1,45 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, timer } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, switchMap } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { JwtPayload } from '../../models/user.model';
+import { environment } from '../../../environments/environment';
 
 const TOKEN_KEY = 'rp_token';
 
-function toBase64Url(str: string): string {
-  return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-}
-
-function buildMockToken(username: string, sub: string): string {
-  const header = toBase64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-  const exp = Math.floor(Date.now() / 1000) + 36 * 60 * 60;
-  const payload = toBase64Url(JSON.stringify({ sub, username, exp }));
-  return `${header}.${payload}.mock_signature`;
-}
-
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // TODO: replace with HttpClient call to POST /auth/login
-  login(email: string, _password: string): Observable<{ token: string }> {
-    return timer(300).pipe(
-      switchMap(() => of({ token: buildMockToken('athlete', 'user-001') }))
-    );
+  private http = inject(HttpClient);
+  private api = environment.apiUrl;
+
+  login(email: string, password: string): Observable<{ token: string }> {
+    // OAuth2PasswordRequestForm requires application/x-www-form-urlencoded
+    const body = new URLSearchParams();
+    body.set('username', email); // FastAPI OAuth2 form uses 'username' for the email field
+    body.set('password', password);
+
+    return this.http
+      .post<{ access_token: string; token_type: string }>(`${this.api}/login`, body.toString(), {
+        headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
+      })
+      .pipe(map(res => ({ token: res.access_token })));
   }
 
-  // TODO: replace with HttpClient call to POST /auth/register
-  register(username: string, _email: string, _password: string): Observable<{ token: string }> {
-    return timer(300).pipe(
-      switchMap(() => of({ token: buildMockToken(username, 'user-001') }))
-    );
+  register(
+    _username: string,
+    email: string,
+    password: string
+  ): Observable<{ token: string }> {
+    // TODO (Shayne): backend /register accepts {email, password} only — no username column yet
+    return this.http
+      .post<{ id: number; email: string; created_at: string }>(`${this.api}/register`, {
+        email,
+        password,
+      })
+      .pipe(
+        // Register returns the user object, not a token — auto-login to get one
+        switchMap(() => this.login(email, password))
+      );
   }
 
   logout(): void {
