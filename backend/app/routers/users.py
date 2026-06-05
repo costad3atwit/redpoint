@@ -33,5 +33,5 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         raise HTTPException(status_code=400, detail="Invalid Credentials")
 
     # TODO (Shayne): add `username` to the User model and include it here so the frontend can greet users by name
-    access_token = create_access_token({"sub":str(user.id)})
+    access_token = create_access_token({"user_id": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
