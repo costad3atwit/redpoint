@@ -1,0 +1,165 @@
+.profile-page {
+  padding: 24px;
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// ── Header card ──────────────────────────────────────────────────────────────
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 0;
+}
+
+.profile-avatar {
+  font-size: 72px;
+  width: 72px;
+  height: 72px;
+  color: var(--rp-accent);
+  flex-shrink: 0;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.display-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+  color: var(--rp-text);
+}
+
+.email {
+  color: rgba(240, 236, 228, 0.6);
+  margin: 0;
+  font-size: 14px;
+}
+
+.since {
+  color: rgba(240, 236, 228, 0.45);
+  font-size: 12px;
+  margin: 0;
+}
+
+// ── Stats card ───────────────────────────────────────────────────────────────
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 8px 0;
+  text-align: center;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-value {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--rp-text);
+}
+
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(240, 236, 228, 0.5);
+}
+
+// ── Detail rows ───────────────────────────────────────────────────────────────
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+
+  &:first-child { padding-top: 8px; }
+  &:last-child  { padding-bottom: 8px; }
+}
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.detail-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(240, 236, 228, 0.5);
+}
+
+.detail-value {
+  font-size: 15px;
+  color: var(--rp-text);
+}
+
+.detail-muted {
+  color: rgba(240, 236, 228, 0.4);
+  font-size: 13px;
+}
+
+// ── Account Actions / Danger Zone ─────────────────────────────────────────────
+
+.danger-card {
+  border: 1px solid rgba(192, 57, 43, 0.35) !important;
+}
+
+.actions-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+}
+
+.delete-btn {
+  background-color: var(--rp-accent) !important;
+  color: #fff !important;
+}
+
+// ── Mobile ────────────────────────────────────────────────────────────────────
+
+@media (max-width: 600px) {
+  .profile-page {
+    padding: 16px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-avatar {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+  }
+
+  .actions-row {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
