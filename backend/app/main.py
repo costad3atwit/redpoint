@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.routers import users, sessions, analytics, routes
 from app.database import Base, engine
 
@@ -9,6 +10,14 @@ import app.models.routes
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200"],  # TODO: add CloudFront domain for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(sessions.router)
 app.include_router(users.router)
