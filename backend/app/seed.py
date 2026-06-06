@@ -19,6 +19,7 @@ def seed_fake_data():
         print("🌱 Seeding fake data into PostgreSQL container using UUID layout...")
         
         test_user = User(
+            username="tester",
             email="tester@wentworth.edu",
             hashed_password="$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36wK6eCHGlA25Ch7A76M1fK"
         )

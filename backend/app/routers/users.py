@@ -15,9 +15,12 @@ router = APIRouter(
 def register_user(user_data: userCreate, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == user_data.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
+    if db.query(User).filter(User.username == user_data.username).first():
+        raise HTTPException(status_code=400, detail="Username already taken")
     
     user = User(
         email=user_data.email,
+        username=user_data.username,
         hashed_password=hash_password(user_data.password)
     )
     db.add(user)
@@ -32,5 +35,5 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid Credentials")
 
-    access_token = create_access_token({"sub":str(user.id)})
-    return {"access_token": access_token, "token_type": "bearer"}
+    access_token = create_access_token({"user_id": str(user.id)})
+    return {"access_token": access_token, "token_type": "bearer", "username": user.username}
