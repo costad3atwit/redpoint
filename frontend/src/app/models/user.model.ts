@@ -1,7 +1,6 @@
 export interface JwtPayload {
-  sub: string;
-  // TODO (Shayne): include `username: string` in the JWT payload so the UI can greet users by name
-  username?: string;
+  user_id: string;
+  username: string;
   exp: number;
 }
 

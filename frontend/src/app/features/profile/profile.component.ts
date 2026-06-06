@@ -34,7 +34,7 @@ export class ProfileComponent implements OnInit {
     const user = this.auth.currentUser();
     if (user?.username) return user.username;
     const email = this.profile()?.email;
-    return email ? email.split('@')[0] : `User #${user?.sub}`;
+    return email ? email.split('@')[0] : `User #${user?.user_id}`;
   });
 
   ngOnInit(): void {

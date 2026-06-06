@@ -26,13 +26,13 @@ export class AuthService {
   }
 
   register(
-    _username: string,
+    username: string,
     email: string,
     password: string
   ): Observable<{ token: string }> {
-    // TODO (Shayne): backend /register accepts {email, password} only — no username column yet
     return this.http
       .post<{ id: number; email: string; created_at: string }>(`${this.api}/register`, {
+        username,
         email,
         password,
       })

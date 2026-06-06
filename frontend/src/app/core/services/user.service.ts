@@ -1,47 +1,45 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { UserProfile, UserStats } from '../../models/user.model';
-import { AuthService } from '../auth/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private auth = inject(AuthService);
+  private http = inject(HttpClient);
+  private api = environment.apiUrl;
 
   getProfile(): Observable<UserProfile> {
-    // TODO: replace with HttpClient call to GET /users/me
-    const sub = this.auth.currentUser()?.sub ?? '1';
-    return of<UserProfile>({
-      id: sub,
-      email: 'athlete@example.com',
-      createdAt: '2025-01-15T00:00:00Z',
-    }).pipe(delay(300));
-  }
-
-  getStats(): Observable<UserStats> {
-    // TODO: replace with HttpClient call to GET /analytics/stats (or derive from sessions)
-    return of<UserStats>({
-      totalSessions: 24,
-      totalRoutesSent: 47,
-      topGradeSent: 'V6',
-    }).pipe(delay(300));
-  }
-
-  updateEmail(newEmail: string, _currentPassword: string): Observable<UserProfile> {
-    // TODO: replace with HttpClient call to PATCH /users/me
-    const sub = this.auth.currentUser()?.sub ?? '1';
-    return of<UserProfile>({ id: sub, email: newEmail, createdAt: '2025-01-15T00:00:00Z' }).pipe(
-      delay(300)
+    return this.http.get<any>(`${this.api}/users/me`).pipe(
+      map(r => ({ id: r.id, email: r.email, username: r.username, createdAt: r.created_at }))
     );
   }
 
-  updatePassword(_currentPassword: string, _newPassword: string): Observable<void> {
-    // TODO: replace with HttpClient call to PATCH /users/me
-    return of(undefined).pipe(delay(300));
+  getStats(): Observable<UserStats> {
+    return this.http.get<any>(`${this.api}/users/me/stats`).pipe(
+      map(r => ({
+        totalSessions: r.total_sessions,
+        totalRoutesSent: r.total_routes_sent,
+        topGradeSent: r.top_grade_sent,
+      }))
+    );
+  }
+
+  updateEmail(newEmail: string, currentPassword: string): Observable<UserProfile> {
+    return this.http
+      .patch<any>(`${this.api}/users/me/email`, { email: newEmail, current_password: currentPassword })
+      .pipe(map(r => ({ id: r.id, email: r.email, username: r.username, createdAt: r.created_at })));
+  }
+
+  updatePassword(currentPassword: string, newPassword: string): Observable<void> {
+    return this.http.patch<void>(`${this.api}/users/me/password`, {
+      current_password: currentPassword,
+      new_password: newPassword,
+    });
   }
 
   deleteAccount(): Observable<void> {
-    // TODO: replace with HttpClient call to DELETE /users/me
-    return of(undefined).pipe(delay(300));
+    return this.http.delete<void>(`${this.api}/users/me`);
   }
 }
