@@ -20,6 +20,19 @@ class userResponse(BaseModel):
 class userProfileResponse(userResponse):
     sessions_logged: int
 
+class UserStatsResponse(BaseModel):
+    total_sessions: int
+    total_routes_sent: int
+    top_grade_sent: str
+
+class UpdateEmailRequest(BaseModel):
+    email: EmailStr
+    current_password: str
+
+class UpdatePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
 #session schemas
 class sessionCreate(BaseModel):
     duration_minutes: int
