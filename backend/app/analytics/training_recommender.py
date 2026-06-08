@@ -14,7 +14,7 @@ def recommend_training(routes, recent_routes_count=10):
     for route in recent_routes:
         if route.style_tags:
             for tag in route.style_tags:
-                style_counter[tag.lower()] += 1
+                style_counter[tag.lower().strip()] += 1
 
     if not style_counter:
         return {
