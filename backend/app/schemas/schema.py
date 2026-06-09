@@ -2,6 +2,7 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
+from app.models.routes import ClimbingEnvironment
 
 #user schemas
 class userCreate(BaseModel):
@@ -59,6 +60,8 @@ class routeCreate(BaseModel):
     send_type: Optional[str] = None
     attempts: Optional[int] = None
     style_tags: Optional[List[str]] = None
+    description: Optional[str] = None
+    environment: ClimbingEnvironment = ClimbingEnvironment.GYM
 
 class routeResponse(routeCreate):
     id: UUID

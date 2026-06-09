@@ -1,8 +1,13 @@
 import uuid
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY
+import enum
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.database import Base
+
+class ClimbingEnvironment(str, enum.Enum):
+    GYM = "gym"
+    OUTDOOR = "outdoor"
 
 class Route(Base):
     __tablename__ = "routes"
@@ -15,5 +20,7 @@ class Route(Base):
     send_type = Column(String, nullable=True) 
     attempts = Column(Integer, default=1)
     style_tags = Column(ARRAY(String), nullable=True)
+    description = Column(String, nullable=True)
+    environment = Column(Enum(ClimbingEnvironment), nullable=False, default=ClimbingEnvironment.GYM)
 
     session = relationship("Session", back_populates="routes")
