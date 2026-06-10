@@ -8,6 +8,7 @@ from app.database import Base
 class ClimbingEnvironment(str, enum.Enum):
     GYM = "gym"
     OUTDOOR = "outdoor"
+    OTHER = 'other'
 
 class Route(Base):
     __tablename__ = "routes"

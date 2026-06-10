@@ -61,7 +61,7 @@ class routeCreate(BaseModel):
     attempts: Optional[int] = None
     style_tags: Optional[List[str]] = None
     description: Optional[str] = None
-    environment: ClimbingEnvironment = ClimbingEnvironment.GYM
+    environment: ClimbingEnvironment = "gym"
 
 class routeResponse(routeCreate):
     id: UUID
