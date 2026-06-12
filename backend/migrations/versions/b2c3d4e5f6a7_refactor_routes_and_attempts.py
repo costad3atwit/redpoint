@@ -34,6 +34,7 @@ def upgrade() -> None:
         sa.Column('grade', sa.String(), nullable=False),
         sa.Column('wall_angle', sa.String(), nullable=True),
         sa.Column('style_tags', postgresql.ARRAY(sa.String()), nullable=True),
+        sa.Column('environment', sa.Enum('gym', 'outdoor', 'other', name='climbingenvironment'), nullable=False, server_default='gym'),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
     )
@@ -62,6 +63,7 @@ def downgrade() -> None:
     op.drop_table('route_attempts')
     op.drop_index('ix_routes_id', table_name='routes')
     op.drop_table('routes')
+    op.execute("DROP TYPE IF EXISTS climbingenvironment")
 
     # Restore old session-owned routes table
     op.create_table(

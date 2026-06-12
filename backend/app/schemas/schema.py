@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
-from app.models.routes import ClimbingEnvironment
+from app.models.routes import ClimbingEnvironment  # noqa: F401 — used in routeCreate
 
 # ── User ──────────────────────────────────────────────────────────────────────
 
@@ -43,6 +43,7 @@ class routeCreate(BaseModel):
     grade: str
     wall_angle: Optional[str] = None
     style_tags: Optional[List[str]] = None
+    environment: Optional[ClimbingEnvironment] = ClimbingEnvironment.GYM
 
 class routeResponse(routeCreate):
     id: UUID
@@ -93,36 +94,3 @@ class sessionResponse(BaseModel):
     route_attempts: List[routeAttemptResponse] = []
     class Config:
         from_attributes = True
-<<<<<<< Updated upstream
-
-#route schemas
-class routeCreate(BaseModel):
-    grade: str
-    wall_angle: Optional[str] = None
-    sent: bool = False
-    send_type: Optional[str] = None
-    attempts: Optional[int] = None
-    style_tags: Optional[List[str]] = None
-    description: Optional[str] = None
-    environment: ClimbingEnvironment = "gym"
-
-class routeResponse(routeCreate):
-    id: UUID
-    session_id: UUID
-    class Config:
-        from_attributes = True
-    
-#attempt schemas
-class attemptCreate(BaseModel):
-    success: bool = False
-    notes: Optional[str] = None
-
-class attemptResponse(attemptCreate):
-    id: UUID
-    route_id: UUID
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
-=======
->>>>>>> Stashed changes
