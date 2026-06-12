@@ -53,6 +53,9 @@ class Route(Base):
     wall_angle = Column(String, nullable=True)
     style_tags = Column(ARRAY(String), nullable=True)
     environment = Column(Enum(ClimbingEnvironment), nullable=False, default=ClimbingEnvironment.GYM)
+    hold_type = Column(Enum(HoldType), nullable=True)
+    style = Column(Enum(ClimbingStyle), nullable=True)
+    wall_style = Column(Enum(WallStyle), nullable=True)
 
     user = relationship("User", back_populates="routes")
     attempts = relationship("RouteAttempt", back_populates="route", cascade="all, delete-orphan")

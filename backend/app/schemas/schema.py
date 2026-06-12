@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
-from app.models.routes import ClimbingEnvironment  # noqa: F401 — used in routeCreate
+from app.models.routes import ClimbingEnvironment, HoldType, ClimbingStyle, WallStyle
 
 # ── User ──────────────────────────────────────────────────────────────────────
 
@@ -44,6 +44,9 @@ class routeCreate(BaseModel):
     wall_angle: Optional[str] = None
     style_tags: Optional[List[str]] = None
     environment: Optional[ClimbingEnvironment] = ClimbingEnvironment.GYM
+    hold_type: Optional[HoldType] = None
+    style: Optional[ClimbingStyle] = None
+    wall_style: Optional[WallStyle] = None
 
 class routeResponse(routeCreate):
     id: UUID
