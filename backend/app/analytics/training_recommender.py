@@ -1,5 +1,11 @@
 from collections import Counter
 
+def normalize(value):
+    if hasattr(value, "value"):
+        return value.value
+    
+    return value.lower().strip()
+
 def recommend_training(routes, recent_routes_count=10):
     recent_routes = sorted(routes, key=lambda route: route.session.date, reverse=True)[:recent_routes_count]
 
@@ -9,7 +15,7 @@ def recommend_training(routes, recent_routes_count=10):
             "recommendation": "Not enough data to provide a training recommendation. Keep climbing!"
         }
     
-    hold_types  = [
+    hold_type  = [
         "crimp",
         "pinch",
         "sloper",
@@ -18,26 +24,26 @@ def recommend_training(routes, recent_routes_count=10):
         "sidepull"
     ]
 
-    styles = [
+    style = [
         "bouldering",
         "sport climbing",
         "top rope",
         "traditional climbing"
     ]
 
-    wall_styles = [
+    wall_style = [
         "overhang",
         "slab",
         "vertical"
     ]
 
-    environments = [
+    environment = [
         "indoor",
         "outdoor",
         "other"
     ]
 
-    send_types = [
+    send_type = [
         "send",
         "flash",
         "day flash",
@@ -46,29 +52,29 @@ def recommend_training(routes, recent_routes_count=10):
     ]
 
     categories = {
-        "hold_type": hold_types,
-        "style": styles,
-        "wall_style": wall_styles,
-        "environment": environments,
-        "send_type": send_types
+        "hold_type": hold_type,
+        "style": style,
+        "wall_style": wall_style,
+        "environment": environment,
+        "send_type": send_type
     }
 
     counters = {category: Counter() for category in categories}
 
     for route in recent_routes:
-        if route.hold_type in hold_types:
+        if route.hold_type in hold_type:
             counters["hold_type"][route.hold_type.lower().strip()] += 1
 
-        if route.style in styles:
+        if route.style in style:
             counters["style"][route.style.lower().strip()] += 1
 
-        if route.wall_style in wall_styles:
+        if route.wall_style in wall_style:
             counters["wall_style"][route.wall_style.lower().strip()] += 1
 
-        if route.environment in environments:
+        if route.environment in environment:
             counters["environment"][route.environment.lower().strip()] += 1
 
-        if route.send_type in send_types:
+        if route.send_type in send_type:
             counters["send_type"][route.send_type.lower().strip()] += 1
 
     category_counts = {}
@@ -83,7 +89,7 @@ def recommend_training(routes, recent_routes_count=10):
 
         recommendations[category] = least_used
 
-    focus = recommendations["hold_types"]
+    focus = recommendations["hold_type"]
 
     return {
         "reccomended_training": focus,
