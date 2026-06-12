@@ -2,9 +2,10 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
-from app.models.routes import ClimbingEnvironment
+from app.models.routes import ClimbingEnvironment, HoldType, ClimbingStyle, WallStyle
 
-#user schemas
+# ── User ──────────────────────────────────────────────────────────────────────
+
 class userCreate(BaseModel):
     username: str
     email: EmailStr
@@ -34,8 +35,52 @@ class UpdatePasswordRequest(BaseModel):
     current_password: str
     new_password: str
 
-#session schemas
+# ── Route (user-owned library) ────────────────────────────────────────────────
+
+class routeCreate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    grade: str
+    wall_angle: Optional[str] = None
+    style_tags: Optional[List[str]] = None
+    environment: Optional[ClimbingEnvironment] = ClimbingEnvironment.GYM
+    hold_type: Optional[HoldType] = None
+    style: Optional[ClimbingStyle] = None
+    wall_style: Optional[WallStyle] = None
+
+class routeResponse(routeCreate):
+    id: UUID
+    user_id: UUID
+    class Config:
+        from_attributes = True
+
+# ── RouteAttempt (session entry) ──────────────────────────────────────────────
+
+class routeAttemptCreate(BaseModel):
+    route_id: UUID
+    sent: bool = False
+    send_type: Optional[str] = None
+    attempts: Optional[int] = 1
+    route_length: Optional[int] = None
+    notes: Optional[str] = None
+
+class routeAttemptResponse(BaseModel):
+    id: UUID
+    session_id: UUID
+    route_id: UUID
+    route: routeResponse
+    sent: bool
+    send_type: Optional[str] = None
+    attempts: Optional[int] = None
+    route_length: Optional[int] = None
+    notes: Optional[str] = None
+    class Config:
+        from_attributes = True
+
+# ── Session ───────────────────────────────────────────────────────────────────
+
 class sessionCreate(BaseModel):
+    date: Optional[datetime] = None
     duration_minutes: int
     rpe: int
     finger_load_rating: int
@@ -49,35 +94,6 @@ class sessionResponse(BaseModel):
     rpe: int
     finger_load_rating: int
     notes: Optional[str] = None
-    class Config:
-        from_attributes = True
-
-#route schemas
-class routeCreate(BaseModel):
-    grade: str
-    wall_angle: Optional[str] = None
-    sent: bool = False
-    send_type: Optional[str] = None
-    attempts: Optional[int] = None
-    style_tags: Optional[List[str]] = None
-    description: Optional[str] = None
-    environment: ClimbingEnvironment = "gym"
-
-class routeResponse(routeCreate):
-    id: UUID
-    session_id: UUID
-    class Config:
-        from_attributes = True
-    
-#attempt schemas
-class attemptCreate(BaseModel):
-    success: bool = False
-    notes: Optional[str] = None
-
-class attemptResponse(attemptCreate):
-    id: UUID
-    route_id: UUID
-    created_at: datetime
-
+    route_attempts: List[routeAttemptResponse] = []
     class Config:
         from_attributes = True

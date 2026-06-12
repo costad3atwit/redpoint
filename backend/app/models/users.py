@@ -15,3 +15,4 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan")
+    routes = relationship("Route", back_populates="user", cascade="all, delete-orphan")
