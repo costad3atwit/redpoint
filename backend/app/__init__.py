@@ -2,6 +2,6 @@ from app.database import Base
 from app.models.users import User
 from app.models.sessions import Session
 from app.models.routes import Route
-from app.models.attempts import Attempt
+from app.models.attempts import RouteAttempt
 
-__all__ = ["Base", "User", "Session", "Route", "Attempt"]
+__all__ = ["Base", "User", "Session", "Route", "RouteAttempt"]

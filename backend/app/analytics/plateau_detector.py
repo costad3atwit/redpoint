@@ -26,21 +26,21 @@ def grade_to_int(grade:str):
 
     return grade_mapping.get(grade.upper().strip(), 0)
 
-def detect_plateau(routes, recent_routes=5):
-    sent_routes = [route for route in routes if route.sent and route.grade and route.session]
+def detect_plateau(route_attempts, recent_routes=5):
+    sent_attempts = [a for a in route_attempts if a.sent and a.route and a.route.grade and a.session]
 
-    if len(sent_routes) < recent_routes*2:
-        return{
+    if len(sent_attempts) < recent_routes * 2:
+        return {
             "plateau_detected": False,
             "message": "Not enough data to determine plateau. Keep climbing!"
         }
-    
-    sent_routes = sorted(sent_routes, key=lambda route: route.session.date, reverse=True)
 
-    grade_values = [grade_to_int(route.grade) for route in sent_routes]
+    sent_attempts = sorted(sent_attempts, key=lambda a: a.session.date, reverse=True)
+
+    grade_values = [grade_to_int(a.route.grade) for a in sent_attempts]
 
     recent_grades = grade_values[:recent_routes]
-    previous_grades = grade_values[recent_routes:recent_routes*2]
+    previous_grades = grade_values[recent_routes:recent_routes * 2]
 
     recent_avg = sum(recent_grades) / len(recent_grades)
     previous_avg = sum(previous_grades) / len(previous_grades)
