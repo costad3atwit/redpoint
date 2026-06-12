@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session as DBSession
 from app.database import get_db
 from app.models.users import User
 from app.models.sessions import Session as TrainingSession
+from app.models.attempts import RouteAttempt
 from app.models.routes import Route
 from app.schemas.schema import (
     userCreate, userResponse,
@@ -55,15 +56,16 @@ def get_me_stats(db: DBSession = Depends(get_db), current_user=Depends(get_curre
 
     total_sessions = db.query(TrainingSession).filter(TrainingSession.user_id == user_id).count()
 
-    sent_routes = (
-        db.query(Route)
+    sent_attempts = (
+        db.query(RouteAttempt)
         .join(TrainingSession)
-        .filter(TrainingSession.user_id == user_id, Route.sent == True)
+        .join(Route)
+        .filter(TrainingSession.user_id == user_id, RouteAttempt.sent == True)
         .all()
     )
 
     top_grade_sent = "—"
-    if sent_routes:
+    if sent_attempts:
         def grade_key(g: str) -> int:
             g = g.strip().upper()
             if g.startswith("V"):
@@ -72,11 +74,11 @@ def get_me_stats(db: DBSession = Depends(get_db), current_user=Depends(get_curre
                 except ValueError:
                     pass
             return -1
-        top_grade_sent = max((r.grade for r in sent_routes), key=grade_key)
+        top_grade_sent = max((a.route.grade for a in sent_attempts), key=grade_key)
 
     return {
         "total_sessions": total_sessions,
-        "total_routes_sent": len(sent_routes),
+        "total_routes_sent": len(sent_attempts),
         "top_grade_sent": top_grade_sent,
     }
 

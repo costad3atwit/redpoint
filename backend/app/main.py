@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import users, sessions, analytics, routes
+from app.routers import users, sessions, analytics, routes, route_attempts
 from app.database import Base, engine
 
 import app.models.users
 import app.models.sessions
 import app.models.routes
+import app.models.attempts
 
 Base.metadata.create_all(bind=engine)
 
@@ -23,6 +24,7 @@ app.include_router(sessions.router)
 app.include_router(users.router)
 app.include_router(analytics.router)
 app.include_router(routes.router)
+app.include_router(route_attempts.router)
 
 
 @app.get("/")

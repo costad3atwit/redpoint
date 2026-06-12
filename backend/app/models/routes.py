@@ -1,20 +1,23 @@
 import uuid
 import enum
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, Enum
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, ForeignKey, Enum
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
 from app.database import Base
+
 
 class ClimbingEnvironment(str, enum.Enum):
     GYM = "gym"
     OUTDOOR = "outdoor"
-    OTHER = 'other'
+    OTHER = "other"
+
 
 class ClimbingStyle(str, enum.Enum):
     BOULDERING = "bouldering"
     SPORT_CLIMBING = "sport climbing"
     TOP_ROPE = "top rope"
     TRADITIONAL_CLIMBING = "traditional climbing"
+
 
 class HoldType(str, enum.Enum):
     CRIMP = "crimp"
@@ -24,10 +27,12 @@ class HoldType(str, enum.Enum):
     JUG = "jug"
     SIDEPULL = "sidepull"
 
+
 class WallStyle(str, enum.Enum):
     OVERHANG = "overhang"
-    VERRTICAL = "vertical"
+    VERTICAL = "vertical"
     SLAB = "slab"
+
 
 class SendType(str, enum.Enum):
     SEND = "send"
@@ -36,21 +41,21 @@ class SendType(str, enum.Enum):
     ONSIGHT = "onsight"
     REDPOINT = "redpoint"
 
+
 class Route(Base):
     __tablename__ = "routes"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4 ,index=True)
-    session_id = Column(UUID(as_uuid=True), ForeignKey("sessions.id", ondelete="CASCADE"), nullable=False)
-    grade = Column(String, nullable=False) 
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    name = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    grade = Column(String, nullable=False)
+    wall_angle = Column(String, nullable=True)
+    style_tags = Column(ARRAY(String), nullable=True)
+    environment = Column(Enum(ClimbingEnvironment), nullable=False, default=ClimbingEnvironment.GYM)
     hold_type = Column(Enum(HoldType), nullable=True)
     style = Column(Enum(ClimbingStyle), nullable=True)
-    wall_style = Column(Enum(WallStyle),nullable=True)
-    wall_angle = Column(String, nullable=True) 
-    sent = Column(Boolean, default=False)
-    send_type = Column(String, nullable=True) 
-    attempts = Column(Integer, default=1)
-    style_tags = Column(ARRAY(String), nullable=True)
-    description = Column(String, nullable=True)
-    environment = Column(Enum(ClimbingEnvironment), nullable=False, default=ClimbingEnvironment.GYM)
+    wall_style = Column(Enum(WallStyle), nullable=True)
 
-    session = relationship("Session", back_populates="routes")
+    user = relationship("User", back_populates="routes")
+    attempts = relationship("RouteAttempt", back_populates="route", cascade="all, delete-orphan")
