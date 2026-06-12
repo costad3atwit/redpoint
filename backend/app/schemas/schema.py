@@ -4,7 +4,8 @@ from typing import Optional, List
 from uuid import UUID
 from app.models.routes import ClimbingEnvironment
 
-#user schemas
+# ── User ──────────────────────────────────────────────────────────────────────
+
 class userCreate(BaseModel):
     username: str
     email: EmailStr
@@ -34,8 +35,48 @@ class UpdatePasswordRequest(BaseModel):
     current_password: str
     new_password: str
 
-#session schemas
+# ── Route (user-owned library) ────────────────────────────────────────────────
+
+class routeCreate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    grade: str
+    wall_angle: Optional[str] = None
+    style_tags: Optional[List[str]] = None
+
+class routeResponse(routeCreate):
+    id: UUID
+    user_id: UUID
+    class Config:
+        from_attributes = True
+
+# ── RouteAttempt (session entry) ──────────────────────────────────────────────
+
+class routeAttemptCreate(BaseModel):
+    route_id: UUID
+    sent: bool = False
+    send_type: Optional[str] = None
+    attempts: Optional[int] = 1
+    route_length: Optional[int] = None
+    notes: Optional[str] = None
+
+class routeAttemptResponse(BaseModel):
+    id: UUID
+    session_id: UUID
+    route_id: UUID
+    route: routeResponse
+    sent: bool
+    send_type: Optional[str] = None
+    attempts: Optional[int] = None
+    route_length: Optional[int] = None
+    notes: Optional[str] = None
+    class Config:
+        from_attributes = True
+
+# ── Session ───────────────────────────────────────────────────────────────────
+
 class sessionCreate(BaseModel):
+    date: Optional[datetime] = None
     duration_minutes: int
     rpe: int
     finger_load_rating: int
@@ -49,8 +90,10 @@ class sessionResponse(BaseModel):
     rpe: int
     finger_load_rating: int
     notes: Optional[str] = None
+    route_attempts: List[routeAttemptResponse] = []
     class Config:
         from_attributes = True
+<<<<<<< Updated upstream
 
 #route schemas
 class routeCreate(BaseModel):
@@ -81,3 +124,5 @@ class attemptResponse(attemptCreate):
 
     class Config:
         from_attributes = True
+=======
+>>>>>>> Stashed changes

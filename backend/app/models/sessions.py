@@ -17,4 +17,4 @@ class Session(Base):
     notes = Column(String, nullable=True)
 
     user = relationship("User", back_populates="sessions")
-    routes = relationship("Route", back_populates="session", cascade="all, delete-orphan")
+    route_attempts = relationship("RouteAttempt", back_populates="session", cascade="all, delete-orphan")

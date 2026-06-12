@@ -1,7 +1,12 @@
 import uuid
+<<<<<<< Updated upstream
 import enum
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, Enum
 from sqlalchemy.dialects.postgresql import UUID
+=======
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
+>>>>>>> Stashed changes
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -39,6 +44,7 @@ class SendType(str, enum.Enum):
 class Route(Base):
     __tablename__ = "routes"
 
+<<<<<<< Updated upstream
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4 ,index=True)
     session_id = Column(UUID(as_uuid=True), ForeignKey("sessions.id", ondelete="CASCADE"), nullable=False)
     grade = Column(String, nullable=False) 
@@ -49,8 +55,17 @@ class Route(Base):
     sent = Column(Boolean, default=False)
     send_type = Column(String, nullable=True) 
     attempts = Column(Integer, default=1)
+=======
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    name = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    grade = Column(String, nullable=False)
+    wall_angle = Column(String, nullable=True)
+>>>>>>> Stashed changes
     style_tags = Column(ARRAY(String), nullable=True)
     description = Column(String, nullable=True)
     environment = Column(Enum(ClimbingEnvironment), nullable=False, default=ClimbingEnvironment.GYM)
 
-    session = relationship("Session", back_populates="routes")
+    user = relationship("User", back_populates="routes")
+    attempts = relationship("RouteAttempt", back_populates="route", cascade="all, delete-orphan")
