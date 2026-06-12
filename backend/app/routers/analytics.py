@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session as DBSession
+from datetime import date
 
 from app.database import get_db
 from app.auth import get_current_user
@@ -16,17 +17,17 @@ router = APIRouter(
 )
 
 @router.get("/acwr")
-def acwr(db: DBSession = Depends(get_db), user=Depends(get_current_user)):
-    sessions = (db.query(TrainingSession).filter(TrainingSession.user_id == user.id).all())
-    return calculate_acwr(sessions)
+def get_acwr(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    sessions = (db.query(TrainingSession).filter(TrainingSession.user_id == current_user["user_id"]).all())
+    return calculate_acwr(sessions, date.today())
 
 @router.get("/plateau")
-def plateau_detector(db: DBSession = Depends(get_db), user=Depends(get_current_user)):
-    routes = (db.query(Route).join(TrainingSession).filter(TrainingSession.user_id == user.id).all())
+def get_plateau_detector(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    routes = (db.query(Route).join(TrainingSession).filter(TrainingSession.user_id == current_user["user_id"]).all())
     return detect_plateau(routes)
 
 @router.get("/training")
-def training_recommender(db: DBSession = Depends(get_db), user=Depends(get_current_user)):
-    routes = (db.query(Route).join(TrainingSession).filter(TrainingSession.user_id == user.id).all())
+def get_training_recommender(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    routes = (db.query(Route).join(TrainingSession).filter(TrainingSession.user_id == current_user["user_id"]).all())
     return recommend_training(routes)
 
