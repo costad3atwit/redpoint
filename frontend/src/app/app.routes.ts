@@ -39,6 +39,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'sessions/:id/edit',
+        loadComponent: () =>
+          import('./features/sessions/session-form/session-form.component').then(
+            m => m.SessionFormComponent
+          ),
+      },
+      {
         path: 'sessions/:id',
         loadComponent: () =>
           import('./features/sessions/session-detail/session-detail.component').then(
