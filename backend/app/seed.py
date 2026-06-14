@@ -7,13 +7,19 @@ from sqlalchemy.orm import Session as DBSession
 from app.database import get_db
 from app.models.users import User
 from app.models.sessions import Session as TrainingSession
-from app.models.routes import Route, ClimbingEnvironment
-from app.models.attempts import Attempt
+from app.models.routes import Route, ClimbingEnvironment, ClimbingStyle, HoldType, WallStyle, SendType
+from app.models.attempts import RouteAttempt
 from app.auth import hash_password
 
-HOLD_TYPES = ["Crimp", "Pinch", "Sloper", "Pocket", "Jug", "Sidepull"]
-DISCIPLINES = ["Bouldering", "Sport Climbing", "Top Rope", "Trad"]
-WALL_STYLES = ["Overhang", "Vertical", "Slab"]
+DISCIPLINE_STYLE_MAP = {
+    "Bouldering": ClimbingStyle.BOULDERING,
+    "Sport Climbing": ClimbingStyle.SPORT_CLIMBING,
+    "Top Rope": ClimbingStyle.TOP_ROPE,
+    "Trad": ClimbingStyle.TRADITIONAL_CLIMBING
+}
+
+HOLD_TYPE_OPTIONS = [HoldType.CRIMP, HoldType.PINCH, HoldType.SLOPER, HoldType.POCKET, HoldType.JUG, HoldType.SIDEPULL]
+WALL_STYLE_OPTIONS = [WallStyle.OVERHANG, WallStyle.VERTICAL, WallStyle.SLAB]
 
 FALL_NOTES = [
     "Slipped off start.",
@@ -34,7 +40,7 @@ RECOVERY_REST_NOTES = ["Low intensity", "Active recovery", "Light deload"]
 
 def clean_database(db: DBSession):
     print("Purging old table records cascading down...")
-    db.query(Attempt).delete()
+    db.query(RouteAttempt).delete()
     db.query(Route).delete()
     db.query(TrainingSession).delete()
     db.query(User).delete()
@@ -52,7 +58,7 @@ def generate_perfect_climbing_data(num_users: int):
         for i in range(num_users):
             username = f"climber_profile_{i + 1}"
             user_tier = random.choices(["beginner", "intermediate", "advanced"], weights=[0.30, 0.55, 0.15])[0]
-            preferred_discipline = random.choices(DISCIPLINES, weights=[0.50, 0.25, 0.20, 0.05])[0]
+            preferred_discipline = random.choices(list(DISCIPLINE_STYLE_MAP.keys()), weights=[0.50, 0.25, 0.20, 0.05])[0]
 
             user = User(
                 username=username,
@@ -72,9 +78,6 @@ def generate_perfect_climbing_data(num_users: int):
                 if current_sim_date >= end_date:
                     current_sim_date = end_date - timedelta(days=1)
                 session_dates.append(current_sim_date)
-
-                if random.random() < 0.05:
-                    session_dates.append(current_sim_date)
             
             session_dates = sorted(session_dates)
 
@@ -114,17 +117,24 @@ def generate_perfect_climbing_data(num_users: int):
 
                 for r_idx in range(num_routes):
                     grade_label = f"V{random.randint(min_v, max_v)}" if preferred_discipline == "Bouldering" else f"5.{random.randint(min_v, max_v)}"
+                    
+                    chosen_wall_style = random.choice(WALL_STYLE_OPTIONS)
+                    chosen_hold_type = random.choice(HOLD_TYPE_OPTIONS)
 
                     route = Route(
-                        session_id=session.id,
+                        user_id=user.id,
+                        name=f"Line {grade_label}",
+                        description=f"Generated mock route simulation sequence #{r_idx + 1}.",
                         grade=grade_label,
-                        wall_angle=random.choice(WALL_STYLES),
-                        style_tags=random.sample(HOLD_TYPES, k=random.randint(1, 3)),
-                        description=f"{preferred_discipline} set line #{r_idx + 1}",
+                        wall_angle=chosen_wall_style.value, 
+                        style_tags=[chosen_hold_type.value],
                         environment=random.choices(
                             [ClimbingEnvironment.GYM, ClimbingEnvironment.OUTDOOR, ClimbingEnvironment.OTHER], 
                             weights=[0.75, 0.20, 0.05]
-                        )[0]
+                        )[0],
+                        hold_type=chosen_hold_type,
+                        style=DISCIPLINE_STYLE_MAP[preferred_discipline],
+                        wall_style=chosen_wall_style
                     )
                     db.add(route)
                     db.flush()
@@ -132,40 +142,30 @@ def generate_perfect_climbing_data(num_users: int):
                     is_sent = random.random() < (0.75 if r_idx < 4 else 0.40)
                     total_burns = random.choices([1, 2, 3, 4, 5], weights=[0.35, 0.35, 0.15, 0.10, 0.05])[0] if is_sent else random.randint(2, 6)
 
-                    for attempt_num in range(1, total_burns + 1):
-                        attempt_success = True if (is_sent and attempt_num == total_burns) else False
-
-                        if attempt_success:
-                            if total_burns == 1:
-                                send_type_choice = random.choice(["Flash", "Day Flash", "Onsight", "Send"])
-                                if send_type_choice == "Onsight":
-                                    notes_str = "Onsight send!"
-                                elif send_type_choice == "Flash":
-                                    notes_str = "Flash send!"
-                                elif send_type_choice == "Day Flash":
-                                    notes_str = "Day Flash send!"
-                                else:
-                                    notes_str = "First try send."
-                            else:
-                                send_type_choice = "Redpoint" if total_burns >= 4 else "Send"
-                                notes_str = f"Redpoint send on try #{attempt_num}." if send_type_choice == "Redpoint" else f"Sent on try #{attempt_num}."
+                    if is_sent:
+                        if total_burns == 1:
+                            send_type_choice = random.choice([SendType.FLASH, SendType.DAY_FLASH, SendType.ONSIGHT, SendType.SEND])
+                            notes_str = f"First burn {send_type_choice.value}."
                         else:
-                            send_type_choice = None
-                            notes_str = f"Attempt #{attempt_num}: {random.choice(FALL_NOTES)}"
+                            send_type_choice = SendType.REDPOINT if total_burns >= 4 else SendType.SEND
+                            notes_str = f"Sent on try #{total_burns}."
+                    else:
+                        send_type_choice = None
+                        notes_str = f"Fell at crux: {random.choice(FALL_NOTES)}"
 
-                        attempt_record = Attempt(
-                            route_id=route.id,
-                            success=attempt_success,
-                            notes=notes_str
-                        )
-                        db.add(attempt_record)
-
-                    route.attempts = total_burns
-                    route.sent = is_sent
-                    route.send_type = send_type_choice
+                    attempt_record = RouteAttempt(
+                        session_id=session.id,
+                        route_id=route.id,
+                        sent=is_sent,
+                        send_type=send_type_choice.value if send_type_choice else None,
+                        attempts=total_burns,
+                        route_length=random.choice([10, 12, 15, None] if preferred_discipline != "Bouldering" else [None]),
+                        notes=notes_str
+                    )
+                    db.add(attempt_record)
 
         db.commit()
-        print(f"\n SUCCESS: Seeding sequence complete. {num_users} users updated smoothly across structural dependencies.")
+        print(f"\nSUCCESS: Seeding sequence complete. {num_users} users updated smoothly across structural dependencies.")
     except Exception as e:
         db.rollback()
         print(f" Error during execution: {e}")
