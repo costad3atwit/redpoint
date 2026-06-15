@@ -14,5 +14,6 @@ export interface UserProfile {
 export interface UserStats {
   totalSessions: number;
   totalRoutesSent: number;
-  topGradeSent: string;
+  topBoulderGrade: string;
+  topRopedGrade: string;
 }
