@@ -25,7 +25,8 @@ class userProfileResponse(userResponse):
 class UserStatsResponse(BaseModel):
     total_sessions: int
     total_routes_sent: int
-    top_grade_sent: str
+    top_boulder_grade: str
+    top_roped_grade: str
 
 class UpdateEmailRequest(BaseModel):
     email: EmailStr
@@ -51,6 +52,7 @@ class routeCreate(BaseModel):
 class routeResponse(routeCreate):
     id: UUID
     user_id: UUID
+    last_route_length: Optional[int] = None
     class Config:
         from_attributes = True
 
