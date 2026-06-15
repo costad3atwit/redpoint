@@ -44,8 +44,8 @@ services:
       - ./frontend:/app
       - /app/node_modules
     environment:
-    depends_on:
       - API_URL=${API_URL}
+    depends_on:
       - backend
 
 volumes:
