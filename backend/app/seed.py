@@ -38,6 +38,7 @@ HIGH_INTENSITY_NOTES = ["High intensity", "Limit project day", "Max effort burn"
 MODERATE_VOLUME_NOTES = ["Great flow", "Moderate volume", "Steady pacing"]
 RECOVERY_REST_NOTES = ["Low intensity", "Active recovery", "Light deload"]
 
+
 def clean_database(db: DBSession):
     print("Purging old table records cascading down...")
     db.query(RouteAttempt).delete()
@@ -46,11 +47,34 @@ def clean_database(db: DBSession):
     db.query(User).delete()
     db.commit()
 
+
+def _grade_label(discipline: str, min_v: int, max_v: int) -> str:
+    grade = random.randint(min_v, max_v)
+    return f"V{grade}" if discipline == "Bouldering" else f"5.{grade}"
+
+
+def _grade_range(discipline: str, user_tier: str, timeline_progress: float) -> tuple[int, int]:
+    if discipline == "Bouldering":
+        if user_tier == "beginner":
+            return int(0 + (2 * timeline_progress)), int(2 + (2 * timeline_progress))
+        elif user_tier == "intermediate":
+            return int(2 + (2 * timeline_progress)), int(5 + (3 * timeline_progress))
+        else:
+            return int(6 + (3 * timeline_progress)), int(9 + (4 * timeline_progress))
+    else:
+        if user_tier == "beginner":
+            return int(5 + (2 * timeline_progress)), int(7 + (2 * timeline_progress))
+        elif user_tier == "intermediate":
+            return int(8 + (1 * timeline_progress)), int(10 + (2 * timeline_progress))
+        else:
+            return int(11 + (1 * timeline_progress)), int(13 + (1 * timeline_progress))
+
+
 def generate_perfect_climbing_data(num_users: int):
     db = next(get_db())
     try:
         clean_database(db)
-        print(f"Seeding synchronous chronological data for {num_users} users...")
+        print(f"Seeding independent route libraries and cross-session attempts for {num_users} users...")
 
         shared_password_hash = hash_password("password123")
         end_date = datetime.now(timezone.utc).date()
@@ -62,7 +86,7 @@ def generate_perfect_climbing_data(num_users: int):
 
             user = User(
                 username=username,
-                email=f"{username}@wentworth.edu",
+                email=f"{username}@wit.edu",
                 hashed_password=shared_password_hash,
                 created_at=datetime.now(timezone.utc) - timedelta(days=90)
             )
@@ -72,27 +96,24 @@ def generate_perfect_climbing_data(num_users: int):
             num_sessions = random.randint(7, 28)
             session_dates = []
             current_sim_date = end_date - timedelta(days=int(num_sessions * 2.2))
-            
+
             for _ in range(num_sessions):
                 current_sim_date += timedelta(days=random.choice([1, 2, 3]))
                 if current_sim_date >= end_date:
                     current_sim_date = end_date - timedelta(days=1)
                 session_dates.append(current_sim_date)
-            
+
             session_dates = sorted(session_dates)
+
+            # Route library: routes the user has registered, independent of sessions.
+            # Grows over time; unsent routes are tracked separately as "projects."
+            route_library: list[Route] = []
+            unsent_routes: list[Route] = []
 
             for session_index, s_date in enumerate(session_dates):
                 session_time = datetime.combine(s_date, datetime.min.time())
                 timeline_progress = (session_index + 1) / len(session_dates)
-
-                if preferred_discipline == "Bouldering":
-                    min_v = int(0 + (2 * timeline_progress)) if user_tier == "beginner" else (int(2 + (2 * timeline_progress)) if user_tier == "intermediate" else int(6 + (3 * timeline_progress)))
-                    max_v = int(2 + (2 * timeline_progress)) if user_tier == "beginner" else (int(5 + (3 * timeline_progress)) if user_tier == "intermediate" else int(9 + (4 * timeline_progress)))
-                    num_routes = random.randint(10, 12) 
-                else:
-                    min_v = int(5 + (2 * timeline_progress)) if user_tier == "beginner" else (int(8 + (1 * timeline_progress)) if user_tier == "intermediate" else int(11 + (1 * timeline_progress)))
-                    max_v = int(7 + (2 * timeline_progress)) if user_tier == "beginner" else (int(10 + (2 * timeline_progress)) if user_tier == "intermediate" else int(13 + (1 * timeline_progress)))
-                    num_routes = random.randint(5, 7) if preferred_discipline == "Top Rope" else random.randint(3, 5)
+                min_v, max_v = _grade_range(preferred_discipline, user_tier, timeline_progress)
 
                 session_rpe = random.randint(5, 10)
                 session_finger_load = random.randint(3, 9)
@@ -115,21 +136,29 @@ def generate_perfect_climbing_data(num_users: int):
                 db.add(session)
                 db.flush()
 
-                for r_idx in range(num_routes):
-                    grade_label = f"V{random.randint(min_v, max_v)}" if preferred_discipline == "Bouldering" else f"5.{random.randint(min_v, max_v)}"
-                    
+                # New routes registered this session (added to the library).
+                if preferred_discipline == "Bouldering":
+                    num_new = random.randint(3, 6)
+                elif preferred_discipline == "Top Rope":
+                    num_new = random.randint(2, 4)
+                else:
+                    num_new = random.randint(1, 3)
+
+                new_routes: list[Route] = []
+                for r_idx in range(num_new):
                     chosen_wall_style = random.choice(WALL_STYLE_OPTIONS)
                     chosen_hold_type = random.choice(HOLD_TYPE_OPTIONS)
+                    grade = _grade_label(preferred_discipline, min_v, max_v)
 
                     route = Route(
                         user_id=user.id,
-                        name=f"Line {grade_label}",
+                        name=f"Line {grade}",
                         description=f"Generated mock route simulation sequence #{r_idx + 1}.",
-                        grade=grade_label,
-                        wall_angle=chosen_wall_style.value, 
+                        grade=grade,
+                        wall_angle=chosen_wall_style.value,
                         style_tags=[chosen_hold_type.value],
                         environment=random.choices(
-                            [ClimbingEnvironment.GYM, ClimbingEnvironment.OUTDOOR, ClimbingEnvironment.OTHER], 
+                            [ClimbingEnvironment.GYM, ClimbingEnvironment.OUTDOOR, ClimbingEnvironment.OTHER],
                             weights=[0.75, 0.20, 0.05]
                         )[0],
                         hold_type=chosen_hold_type,
@@ -138,9 +167,27 @@ def generate_perfect_climbing_data(num_users: int):
                     )
                     db.add(route)
                     db.flush()
+                    new_routes.append(route)
+                    route_library.append(route)
 
-                    is_sent = random.random() < (0.75 if r_idx < 4 else 0.40)
-                    total_burns = random.choices([1, 2, 3, 4, 5], weights=[0.35, 0.35, 0.15, 0.10, 0.05])[0] if is_sent else random.randint(2, 6)
+                # Re-attempts: pull projects (unsent routes) from the existing library.
+                # This is the key cross-session behavior enabled by the new schema.
+                num_repeats = min(random.randint(0, 3), len(unsent_routes))
+                repeat_routes = random.sample(unsent_routes, k=num_repeats) if num_repeats > 0 else []
+
+                routes_this_session = new_routes + repeat_routes
+
+                for r_idx, route in enumerate(routes_this_session):
+                    is_repeat = route in repeat_routes
+                    # Projects get a modest bump in send probability — the climber has worked it before.
+                    base_send_prob = 0.75 if r_idx < 4 else 0.40
+                    send_prob = min(base_send_prob + 0.20, 0.92) if is_repeat else base_send_prob
+
+                    is_sent = random.random() < send_prob
+                    total_burns = (
+                        random.choices([1, 2, 3, 4, 5], weights=[0.35, 0.35, 0.15, 0.10, 0.05])[0]
+                        if is_sent else random.randint(2, 6)
+                    )
 
                     if is_sent:
                         if total_burns == 1:
@@ -149,9 +196,13 @@ def generate_perfect_climbing_data(num_users: int):
                         else:
                             send_type_choice = SendType.REDPOINT if total_burns >= 4 else SendType.SEND
                             notes_str = f"Sent on try #{total_burns}."
+                        if route in unsent_routes:
+                            unsent_routes.remove(route)
                     else:
                         send_type_choice = None
                         notes_str = f"Fell at crux: {random.choice(FALL_NOTES)}"
+                        if route not in unsent_routes:
+                            unsent_routes.append(route)
 
                     attempt_record = RouteAttempt(
                         session_id=session.id,
@@ -165,13 +216,14 @@ def generate_perfect_climbing_data(num_users: int):
                     db.add(attempt_record)
 
         db.commit()
-        print(f"\nSUCCESS: Seeding sequence complete. {num_users} users updated smoothly across structural dependencies.")
+        print(f"\nSUCCESS: Seeding complete. {num_users} users seeded with independent route libraries and cross-session project attempts.")
     except Exception as e:
         db.rollback()
-        print(f" Error during execution: {e}")
+        print(f"Error during execution: {e}")
         raise e
     finally:
         db.close()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Synchronous analytical seed manager.")
