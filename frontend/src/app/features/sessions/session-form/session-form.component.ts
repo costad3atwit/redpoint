@@ -25,10 +25,20 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { SessionService } from '../../../core/services/session.service';
 import { RouteService } from '../../../core/services/route.service';
 import { Route, RouteAttempt, CreateAttemptPayload, CreateRoutePayload } from '../../../models/session.model';
-
-const GRADES = ['VB', ...Array.from({ length: 18 }, (_, i) => `V${i}`)];
+import { GradeOption, V_GRADES, YDS_GRADES } from '../../../core/utils/grade-utils';
 const WALL_ANGLES = ['Slab', 'Vertical', 'Overhang', 'Cave'];
 const SEND_TYPES = ['Send', 'Flash', 'Onsight', 'Redpoint', 'Repeat'];
+const CLIMBING_STYLES: { label: string; value: string }[] = [
+  { label: 'Bouldering',       value: 'bouldering' },
+  { label: 'Sport Climbing',   value: 'sport climbing' },
+  { label: 'Top Rope',         value: 'top rope' },
+  { label: 'Traditional',      value: 'traditional climbing' },
+];
+const ENVIRONMENTS: { label: string; value: string }[] = [
+  { label: 'Gym',     value: 'gym' },
+  { label: 'Outdoor', value: 'outdoor' },
+  { label: 'Other',   value: 'other' },
+];
 
 @Component({
   selector: 'rp-session-form',
@@ -139,9 +149,10 @@ const SEND_TYPES = ['Send', 'Flash', 'Onsight', 'Redpoint', 'Repeat'];
                               <span class="picker-grade">{{ r.grade }}</span>
                               <div class="picker-meta">
                                 <span class="picker-name">{{ r.name ?? 'Unnamed route' }}</span>
-                                @if (r.wallAngle) {
-                                  <span class="picker-angle">{{ r.wallAngle }}</span>
-                                }
+                                <span class="picker-tags">
+                                  @if (r.style) { <span class="picker-tag">{{ formatStyle(r.style) }}</span> }
+                                  @if (r.wallAngle) { <span class="picker-tag">{{ r.wallAngle }}</span> }
+                                </span>
                               </div>
                             </div>
                           }
@@ -153,9 +164,15 @@ const SEND_TYPES = ['Send', 'Flash', 'Onsight', 'Redpoint', 'Repeat'];
                             <span class="route-grade-badge">{{ getSelectedRoute(route)!.grade }}</span>
                             <div>
                               <p class="selected-name">{{ getSelectedRoute(route)!.name ?? 'Unnamed route' }}</p>
-                              @if (getSelectedRoute(route)!.wallAngle) {
-                                <p class="selected-angle">{{ getSelectedRoute(route)!.wallAngle }}</p>
-                              }
+                              <p class="selected-angle">
+                                @if (getSelectedRoute(route)!.style) {
+                                  {{ formatStyle(getSelectedRoute(route)!.style!) }}
+                                }
+                                @if (getSelectedRoute(route)!.style && getSelectedRoute(route)!.wallAngle) { · }
+                                @if (getSelectedRoute(route)!.wallAngle) {
+                                  {{ getSelectedRoute(route)!.wallAngle }}
+                                }
+                              </p>
                             </div>
                           </div>
                           <button mat-button type="button" (click)="clearSelectedRoute(route)">Change</button>
@@ -165,10 +182,28 @@ const SEND_TYPES = ['Send', 'Flash', 'Onsight', 'Redpoint', 'Repeat'];
                       <!-- New route fields -->
                       <div class="fields-row">
                         <mat-form-field appearance="fill">
+                          <mat-label>Climbing Style</mat-label>
+                          <mat-select formControlName="style" (selectionChange)="onStyleChange(route)">
+                            @for (s of climbingStyles; track s.value) {
+                              <mat-option [value]="s.value">{{ s.label }}</mat-option>
+                            }
+                          </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                          <mat-label>Environment</mat-label>
+                          <mat-select formControlName="environment">
+                            @for (e of environments; track e.value) {
+                              <mat-option [value]="e.value">{{ e.label }}</mat-option>
+                            }
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div class="fields-row">
+                        <mat-form-field appearance="fill">
                           <mat-label>Grade</mat-label>
                           <mat-select formControlName="grade">
-                            @for (g of grades; track g) {
-                              <mat-option [value]="g">{{ g }}</mat-option>
+                            @for (g of gradesForRoute(route); track g.value) {
+                              <mat-option [value]="g.value">{{ g.label }}</mat-option>
                             }
                           </mat-select>
                         </mat-form-field>
@@ -284,7 +319,8 @@ const SEND_TYPES = ['Send', 'Flash', 'Onsight', 'Redpoint', 'Repeat'];
     }
     .picker-meta { display: flex; flex-direction: column; }
     .picker-name { font-size: 0.9rem; }
-    .picker-angle { font-size: 0.75rem; color: var(--rp-text-muted); }
+    .picker-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+    .picker-tag { font-size: 0.72rem; color: var(--rp-text-muted); }
     .picker-empty { padding: 16px; text-align: center; color: var(--rp-text-muted); font-size: 0.85rem; margin: 0; }
 
     /* Selected route */
@@ -323,9 +359,12 @@ export class SessionFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
 
-  readonly grades = GRADES;
+  readonly vGrades: GradeOption[] = V_GRADES;
+  readonly ydsGrades: GradeOption[] = YDS_GRADES;
   readonly wallAngles = WALL_ANGLES;
   readonly sendTypes = SEND_TYPES;
+  readonly climbingStyles = CLIMBING_STYLES;
+  readonly environments = ENVIRONMENTS;
 
   readonly editId = signal<string | null>(null);
   readonly submitting = signal(false);
@@ -429,11 +468,15 @@ export class SessionFormComponent implements OnInit {
       grade?: string;
       wall_angle?: string;
       name?: string;
+      style?: string;
+      environment?: string;
     }
   ): FormGroup {
     return this.fb.group({
       mode: [mode],
       // new-route fields
+      style: [values?.style ?? 'bouldering'],
+      environment: [values?.environment ?? 'gym'],
       grade: [values?.grade ?? 'V0'],
       wall_angle: [values?.wall_angle ?? 'Vertical'],
       name: [values?.name ?? ''],
@@ -468,9 +511,32 @@ export class SessionFormComponent implements OnInit {
   }
 
   selectRoute(control: AbstractControl, route: Route): void {
-    control.patchValue({ route_id: route.id });
+    control.patchValue({
+      route_id: route.id,
+      route_length: route.lastRouteLength ?? null,
+    });
     this.selectedRouteByControl.set(control, route);
     this.routeSearch.set('');
+  }
+
+  gradesForRoute(control: AbstractControl): GradeOption[] {
+    return control.get('style')?.value === 'bouldering' ? this.vGrades : this.ydsGrades;
+  }
+
+  onStyleChange(control: AbstractControl): void {
+    const isBouldering = control.get('style')?.value === 'bouldering';
+    const currentGrade: string = control.get('grade')?.value ?? '';
+    const isVGrade = currentGrade.toUpperCase().startsWith('V');
+    if (isBouldering && !isVGrade) {
+      control.patchValue({ grade: 'V0' });
+    } else if (!isBouldering && isVGrade) {
+      control.patchValue({ grade: '5.6' });
+    }
+  }
+
+  formatStyle(style: string): string {
+    const found = CLIMBING_STYLES.find(s => s.value === style);
+    return found ? found.label : style;
   }
 
   clearSelectedRoute(control: AbstractControl): void {
@@ -528,6 +594,8 @@ export class SessionFormComponent implements OnInit {
                     grade: r.grade,
                     wall_angle: r.wall_angle || undefined,
                     name: r.name || undefined,
+                    style: r.style || undefined,
+                    environment: r.environment || undefined,
                   };
                   return this.routeService.createRoute(routePayload).pipe(
                     switchMap(route => {

@@ -31,6 +31,9 @@ export class RouteService {
       grade: r.grade,
       wallAngle: r.wall_angle,
       styleTags: r.style_tags,
+      style: r.style,
+      environment: r.environment,
+      lastRouteLength: r.last_route_length ?? undefined,
     };
   }
 }
