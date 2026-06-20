@@ -39,10 +39,10 @@ export function gradeWithFont(grade: string): string {
   return font ? `${grade} / ${font}` : grade;
 }
 
-const V_VALUES = ['VB', 'V0', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8',
+export const V_VALUES = ['VB', 'V0', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8',
                   'V9', 'V10', 'V11', 'V12', 'V13', 'V14', 'V15', 'V16', 'V17'];
 
-const YDS_VALUES = [
+export const YDS_VALUES = [
   '5.1', '5.2', '5.3', '5.4',
   '5.5', '5.6', '5.7', '5.8', '5.9',
   '5.10a', '5.10b', '5.10c', '5.10d',
@@ -55,3 +55,21 @@ const YDS_VALUES = [
 
 export const V_GRADES: GradeOption[] = V_VALUES.map(v => ({ value: v, label: gradeWithFont(v) }));
 export const YDS_GRADES: GradeOption[] = YDS_VALUES.map(y => ({ value: y, label: gradeWithFont(y) }));
+
+export function gradeToNumber(grade: string): number | null {
+  if (!grade) return null;
+  if (grade.toUpperCase().startsWith('V')) {
+    const i = V_VALUES.indexOf(grade.toUpperCase());
+    return i >= 0 ? i : null;
+  }
+  const i = YDS_VALUES.indexOf(grade);
+  return i >= 0 ? i : null;
+}
+
+export function numberToVGrade(n: number): string {
+  return V_VALUES[Math.round(n)] ?? '';
+}
+
+export function numberToYdsGrade(n: number): string {
+  return YDS_VALUES[Math.round(n)] ?? '';
+}
