@@ -49,8 +49,8 @@ type AcwrStatus = 'Undertraining' | 'Optimal' | 'Caution' | 'Overtraining Risk';
             </div>
             <div class="gauge-labels">
               <span>0</span>
-              <span>0.8</span>
-              <span>1.3</span>
+              <span>0.5</span>
+              <span>1</span>
               <span>1.5</span>
               <span>2.0+</span>
             </div>
@@ -119,10 +119,10 @@ type AcwrStatus = 'Undertraining' | 'Optimal' | 'Caution' | 'Overtraining Risk';
       display: flex;
     }
     .zone { height: 100%; }
-    .zone-under  { width: 20%; background: rgba(240, 236, 228, 0.15); border-radius: 5px 0 0 5px; }
-    .zone-optimal { width: 31.25%; background: rgba(39, 174, 96, 0.4); }
-    .zone-caution { width: 12.5%; background: rgba(230, 126, 34, 0.4); }
-    .zone-over   { width: 36.25%; background: rgba(192, 57, 43, 0.35); border-radius: 0 5px 5px 0; }
+    .zone-under  { width: 40%; background: rgba(240, 236, 228, 0.15); border-radius: 5px 0 0 5px; }
+    .zone-optimal { width: 25%; background: rgba(39, 174, 96, 0.4); }
+    .zone-caution { width: 10%; background: rgba(230, 126, 34, 0.4); }
+    .zone-over   { width: 25%; background: rgba(192, 57, 43, 0.35); border-radius: 0 5px 5px 0; }
 
     .gauge-marker {
       position: absolute;
