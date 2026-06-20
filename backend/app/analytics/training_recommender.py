@@ -40,9 +40,10 @@ def recommend_training(route_attempts, recent_routes_count=10):
         route = attempt.route
         if route:
             if route.hold_type:
-                ht = normalize(route.hold_type)
-                if ht in hold_type_options:
-                    counters["hold_type"][ht] += 1
+                for hold_type in route.hold_type:
+                    ht = normalize(hold_type)
+                    if ht in hold_type_options:
+                        counters["hold_type"][ht] += 1
 
             if route.style:
                 st = normalize(route.style)
