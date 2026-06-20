@@ -42,10 +42,8 @@ class routeCreate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     grade: str
-    wall_angle: Optional[str] = None
-    style_tags: Optional[List[str]] = None
     environment: Optional[ClimbingEnvironment] = ClimbingEnvironment.GYM
-    hold_type: Optional[HoldType] = None
+    hold_type: Optional[List[HoldType]] = None
     style: Optional[ClimbingStyle] = None
     wall_style: Optional[WallStyle] = None
 

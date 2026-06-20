@@ -155,13 +155,11 @@ def generate_perfect_climbing_data(num_users: int):
                         name=f"Line {grade}",
                         description=f"Generated mock route simulation sequence #{r_idx + 1}.",
                         grade=grade,
-                        wall_angle=chosen_wall_style.value,
-                        style_tags=[chosen_hold_type.value],
                         environment=random.choices(
                             [ClimbingEnvironment.GYM, ClimbingEnvironment.OUTDOOR, ClimbingEnvironment.OTHER],
                             weights=[0.75, 0.20, 0.05]
                         )[0],
-                        hold_type=chosen_hold_type,
+                        hold_type=[chosen_hold_type],
                         style=DISCIPLINE_STYLE_MAP[preferred_discipline],
                         wall_style=chosen_wall_style
                     )

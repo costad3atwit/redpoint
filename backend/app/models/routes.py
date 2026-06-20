@@ -50,10 +50,8 @@ class Route(Base):
     name = Column(String, nullable=True)
     description = Column(String, nullable=True)
     grade = Column(String, nullable=False)
-    wall_angle = Column(String, nullable=True)
-    style_tags = Column(ARRAY(String), nullable=True)
     environment = Column(Enum(ClimbingEnvironment), nullable=False, default=ClimbingEnvironment.GYM)
-    hold_type = Column(Enum(HoldType), nullable=True)
+    hold_type = Column(ARRAY(Enum(HoldType)), nullable=True)
     style = Column(Enum(ClimbingStyle), nullable=True)
     wall_style = Column(Enum(WallStyle), nullable=True)
 
