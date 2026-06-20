@@ -84,8 +84,8 @@ import { Session } from '../../../models/session.model';
                     }
                   </div>
                   <div class="route-chips">
-                    @if (attempt.route.wallAngle) {
-                      <span class="chip">{{ attempt.route.wallAngle }}</span>
+                    @if (attempt.route.wallStyle) {
+                      <span class="chip">{{ attempt.route.wallStyle }}</span>
                     }
                     @if (attempt.sent) {
                       <span class="chip chip--sent">{{ attempt.sendType ?? 'Sent' }}</span>
