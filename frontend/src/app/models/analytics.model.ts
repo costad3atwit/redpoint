@@ -1,34 +1,37 @@
-export interface AcwrResult {
-  ratio: number;
+export interface AcwrData {
   acuteLoad: number;
   chronicLoad: number;
-  status: 'Undertraining' | 'Optimal' | 'Caution' | 'Overtraining Risk';
+  acwrRatio: number;
+  overtrainingRisk: boolean;
+  insufficientData: boolean;
 }
 
-export interface AcwrWeek {
-  weekStart: string;
-  ratio: number;
+export interface PlateauData {
+  boulderPlateauDetected: boolean;
+  boulderRecentAverageGrade: number;
+  boulderPreviousAverageGrade: number;
+  boulderImprovement: number;
+  boulderMessage: string;
+  boulderInsufficientData: boolean;
+  ropePlateauDetected: boolean;
+  ropeRecentAverageGrade: number;
+  ropePreviousAverageGrade: number;
+  ropeImprovement: number;
+  ropeMessage: string;
+  ropeInsufficientData: boolean;
 }
 
-export interface PlateauResult {
-  detected: boolean;
-  grade?: string;
-  sessionsSpan?: number;
+export interface CategoryCounts {
+  hold_type: Record<string, number>;
+  style: Record<string, number>;
+  wall_style: Record<string, number>;
+  environment: Record<string, number>;
+  send_type: Record<string, number>;
 }
 
-export interface SessionGradeRow {
-  date: string;
-  avgGrade: number;
-  delta: number;
-}
-
-export interface TrainingFocusResult {
+export interface TrainingData {
+  reccomendedTraining: string;
+  recommendations: Record<string, string>;
+  categoryCounts: CategoryCounts;
   recommendation: string;
-  secondary: string;
-  mostLogged: string;
-}
-
-export interface StyleFrequency {
-  tag: string;
-  count: number;
 }

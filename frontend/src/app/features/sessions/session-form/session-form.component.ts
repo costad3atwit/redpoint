@@ -26,8 +26,25 @@ import { SessionService } from '../../../core/services/session.service';
 import { RouteService } from '../../../core/services/route.service';
 import { Route, RouteAttempt, CreateAttemptPayload, CreateRoutePayload } from '../../../models/session.model';
 import { GradeOption, V_GRADES, YDS_GRADES } from '../../../core/utils/grade-utils';
-const WALL_ANGLES = ['Slab', 'Vertical', 'Overhang', 'Cave'];
-const SEND_TYPES = ['Send', 'Flash', 'Onsight', 'Redpoint', 'Repeat'];
+const WALL_STYLES: { label: string; value: string }[] = [
+  { label: 'Overhang', value: 'overhang' },
+  { label: 'Vertical',  value: 'vertical' },
+  { label: 'Slab',      value: 'slab' },
+];
+const SEND_TYPES: { label: string; value: string }[] = [
+  { label: 'Send',     value: 'send' },
+  { label: 'Flash',    value: 'flash' },
+  { label: 'Onsight',  value: 'onsight' },
+  { label: 'Redpoint', value: 'redpoint' },
+];
+const HOLD_TYPES: { label: string; value: string }[] = [
+  { label: 'Crimp',    value: 'crimp' },
+  { label: 'Pinch',    value: 'pinch' },
+  { label: 'Sloper',   value: 'sloper' },
+  { label: 'Pocket',   value: 'pocket' },
+  { label: 'Jug',      value: 'jug' },
+  { label: 'Sidepull', value: 'sidepull' },
+];
 const CLIMBING_STYLES: { label: string; value: string }[] = [
   { label: 'Bouldering',       value: 'bouldering' },
   { label: 'Sport Climbing',   value: 'sport climbing' },
@@ -151,7 +168,7 @@ const ENVIRONMENTS: { label: string; value: string }[] = [
                                 <span class="picker-name">{{ r.name ?? 'Unnamed route' }}</span>
                                 <span class="picker-tags">
                                   @if (r.style) { <span class="picker-tag">{{ formatStyle(r.style) }}</span> }
-                                  @if (r.wallAngle) { <span class="picker-tag">{{ r.wallAngle }}</span> }
+                                  @if (r.wallStyle) { <span class="picker-tag">{{ formatWallStyle(r.wallStyle) }}</span> }
                                 </span>
                               </div>
                             </div>
@@ -168,9 +185,9 @@ const ENVIRONMENTS: { label: string; value: string }[] = [
                                 @if (getSelectedRoute(route)!.style) {
                                   {{ formatStyle(getSelectedRoute(route)!.style!) }}
                                 }
-                                @if (getSelectedRoute(route)!.style && getSelectedRoute(route)!.wallAngle) { · }
-                                @if (getSelectedRoute(route)!.wallAngle) {
-                                  {{ getSelectedRoute(route)!.wallAngle }}
+                                @if (getSelectedRoute(route)!.style && getSelectedRoute(route)!.wallStyle) { · }
+                                @if (getSelectedRoute(route)!.wallStyle) {
+                                  {{ formatWallStyle(getSelectedRoute(route)!.wallStyle!) }}
                                 }
                               </p>
                             </div>
@@ -208,10 +225,10 @@ const ENVIRONMENTS: { label: string; value: string }[] = [
                           </mat-select>
                         </mat-form-field>
                         <mat-form-field appearance="fill">
-                          <mat-label>Wall Angle</mat-label>
-                          <mat-select formControlName="wall_angle">
-                            @for (a of wallAngles; track a) {
-                              <mat-option [value]="a">{{ a }}</mat-option>
+                          <mat-label>Wall Style</mat-label>
+                          <mat-select formControlName="wall_style">
+                            @for (w of wallStyles; track w.value) {
+                              <mat-option [value]="w.value">{{ w.label }}</mat-option>
                             }
                           </mat-select>
                         </mat-form-field>
@@ -220,6 +237,20 @@ const ENVIRONMENTS: { label: string; value: string }[] = [
                         <mat-label>Route Name (optional)</mat-label>
                         <input matInput formControlName="name" placeholder="e.g. The Crimpy One" />
                       </mat-form-field>
+
+                      <div class="hold-type-section">
+                        <span class="section-label hold-type-label">Hold Types</span>
+                        <div class="pill-row">
+                          @for (h of holdTypes; track h.value) {
+                            <button
+                              type="button"
+                              class="pill"
+                              [class.pill--selected]="isHoldTypeSelected(route, h.value)"
+                              (click)="toggleHoldType(route, h.value)"
+                            >{{ h.label }}</button>
+                          }
+                        </div>
+                      </div>
                     }
 
                     <!-- Attempt fields — always shown once a route is selected or in new-route mode -->
@@ -241,8 +272,11 @@ const ENVIRONMENTS: { label: string; value: string }[] = [
                           <mat-form-field appearance="fill" class="send-type-field">
                             <mat-label>Send Type</mat-label>
                             <mat-select formControlName="send_type">
-                              @for (st of sendTypes; track st) {
-                                <mat-option [value]="st">{{ st }}</mat-option>
+                              @for (st of sendTypes; track st.value) {
+                                <mat-option
+                                  [value]="st.value"
+                                  [disabled]="st.value === 'flash' && route.get('attempts')?.value !== 1"
+                                >{{ st.label }}</mat-option>
                               }
                             </mat-select>
                           </mat-form-field>
@@ -344,6 +378,26 @@ const ENVIRONMENTS: { label: string; value: string }[] = [
     .selected-name { margin: 0; font-size: 0.9rem; }
     .selected-angle { margin: 2px 0 0; font-size: 0.75rem; color: var(--rp-text-muted); }
 
+    .hold-type-section { width: 100%; margin-top: 12px; }
+    .hold-type-label { display: block; margin-bottom: 8px; }
+    .pill-row { display: flex; gap: 8px; flex-wrap: wrap; width: 100%; }
+    .pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--rp-border);
+      background: var(--rp-surface-elevated);
+      color: var(--rp-text-muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
+    }
+    .pill:hover { border-color: var(--rp-accent); }
+    .pill--selected {
+      background: var(--rp-accent);
+      border-color: var(--rp-accent);
+      color: #fff;
+    }
+
     .attempt-divider { margin: 12px 0; }
     .sent-row { display: flex; align-items: center; gap: 24px; margin-top: 8px; flex-wrap: wrap; }
     .send-type-field { flex: 1; min-width: 160px; }
@@ -361,8 +415,9 @@ export class SessionFormComponent implements OnInit {
 
   readonly vGrades: GradeOption[] = V_GRADES;
   readonly ydsGrades: GradeOption[] = YDS_GRADES;
-  readonly wallAngles = WALL_ANGLES;
+  readonly wallStyles = WALL_STYLES;
   readonly sendTypes = SEND_TYPES;
+  readonly holdTypes = HOLD_TYPES;
   readonly climbingStyles = CLIMBING_STYLES;
   readonly environments = ENVIRONMENTS;
 
@@ -466,20 +521,22 @@ export class SessionFormComponent implements OnInit {
       notes?: string;
       // new-route fields
       grade?: string;
-      wall_angle?: string;
+      wall_style?: string;
       name?: string;
       style?: string;
       environment?: string;
+      hold_type?: string[];
     }
   ): FormGroup {
-    return this.fb.group({
+    const group = this.fb.group({
       mode: [mode],
       // new-route fields
       style: [values?.style ?? 'bouldering'],
       environment: [values?.environment ?? 'gym'],
       grade: [values?.grade ?? 'V0'],
-      wall_angle: [values?.wall_angle ?? 'Vertical'],
+      wall_style: [values?.wall_style ?? 'vertical'],
       name: [values?.name ?? ''],
+      hold_type: [values?.hold_type ?? []],
       // existing-route field
       route_id: [values?.route_id ?? null],
       // attempt fields
@@ -489,6 +546,27 @@ export class SessionFormComponent implements OnInit {
       attempts: [values?.attempts ?? 1, Validators.min(1)],
       notes: [values?.notes ?? ''],
     });
+
+    group.get('attempts')!.valueChanges.subscribe(value => {
+      if (value !== 1 && group.get('send_type')?.value === 'flash') {
+        group.get('send_type')!.setValue(null);
+      }
+    });
+
+    return group;
+  }
+
+  isHoldTypeSelected(route: AbstractControl, value: string): boolean {
+    const selected: string[] = route.get('hold_type')?.value ?? [];
+    return selected.includes(value);
+  }
+
+  toggleHoldType(route: AbstractControl, value: string): void {
+    const control = route.get('hold_type')!;
+    const selected: string[] = control.value ?? [];
+    control.setValue(
+      selected.includes(value) ? selected.filter(v => v !== value) : [...selected, value]
+    );
   }
 
   addNewRoute(): void {
@@ -537,6 +615,11 @@ export class SessionFormComponent implements OnInit {
   formatStyle(style: string): string {
     const found = CLIMBING_STYLES.find(s => s.value === style);
     return found ? found.label : style;
+  }
+
+  formatWallStyle(wallStyle: string): string {
+    const found = WALL_STYLES.find(w => w.value === wallStyle);
+    return found ? found.label : wallStyle;
   }
 
   clearSelectedRoute(control: AbstractControl): void {
@@ -592,10 +675,11 @@ export class SessionFormComponent implements OnInit {
                 } else {
                   const routePayload: CreateRoutePayload = {
                     grade: r.grade,
-                    wall_angle: r.wall_angle || undefined,
+                    wall_style: r.wall_style || undefined,
                     name: r.name || undefined,
                     style: r.style || undefined,
                     environment: r.environment || undefined,
+                    hold_type: r.hold_type?.length ? r.hold_type : undefined,
                   };
                   return this.routeService.createRoute(routePayload).pipe(
                     switchMap(route => {
