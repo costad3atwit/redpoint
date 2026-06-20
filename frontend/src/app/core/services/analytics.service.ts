@@ -17,6 +17,7 @@ export class AnalyticsService {
         chronicLoad: r.chronic_load,
         acwrRatio: r.acwr_ratio,
         overtrainingRisk: r.overtraining_risk,
+        insufficientData: r.insufficient_data,
       }))
     );
   }
@@ -29,11 +30,13 @@ export class AnalyticsService {
         boulderPreviousAverageGrade: r.boulder_previous_average_grade,
         boulderImprovement: r.boulder_improvement,
         boulderMessage: r.boulder_message,
+        boulderInsufficientData: r.boulder_insufficient_data,
         ropePlateauDetected: r.rope_plateau_detected,
         ropeRecentAverageGrade: r.rope_recent_average_grade,
         ropePreviousAverageGrade: r.rope_previous_average_grade,
         ropeImprovement: r.rope_improvement,
         ropeMessage: r.rope_message,
+        ropeInsufficientData: r.rope_insufficient_data,
       }))
     );
   }

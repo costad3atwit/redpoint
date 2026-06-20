@@ -46,9 +46,11 @@ interface WeekBucket {
 
         <div class="plateau-status-row">
           <div class="status-left">
-            <span class="status-badge" [class.plateau]="plateauDetected" [class.improving]="!plateauDetected">
-              {{ plateauDetected ? 'Plateau Detected' : 'Improving' }}
-            </span>
+            <span class="status-badge"
+              [class.plateau]="badgeState === 'plateau'"
+              [class.improving]="badgeState === 'improving'"
+              [class.insufficient]="badgeState === 'insufficient'"
+            >{{ badgeLabel }}</span>
             <span class="status-message">{{ statusMessage }}</span>
           </div>
           <mat-form-field appearance="outline" class="weeks-select">
@@ -136,6 +138,11 @@ interface WeekBucket {
       border: 1px solid var(--rp-status-optimal);
       color: var(--rp-status-optimal);
     }
+    .status-badge.insufficient {
+      background: rgba(230, 126, 34, 0.12);
+      border: 1px solid var(--rp-status-caution);
+      color: var(--rp-status-caution);
+    }
     .status-message { font-size: 0.875rem; color: var(--rp-text-muted); }
 
     .discipline-toggle {
@@ -183,16 +190,33 @@ export class PlateauCardComponent implements OnChanges {
   chartOptions!: ChartOptions<'bar'>;
   hasData = false;
 
-  get plateauDetected(): boolean {
-    return this.discipline === 'boulder'
+  get badgeState(): 'plateau' | 'improving' | 'insufficient' {
+    const insufficientData = this.discipline === 'boulder'
+      ? this.plateauData.boulderInsufficientData
+      : this.plateauData.ropeInsufficientData;
+    // Fields not yet provided by the backend fall back to "insufficient" rather than
+    // silently reading as "improving".
+    if (insufficientData ?? true) return 'insufficient';
+
+    const plateauDetected = this.discipline === 'boulder'
       ? this.plateauData.boulderPlateauDetected
       : this.plateauData.ropePlateauDetected;
+    return plateauDetected ? 'plateau' : 'improving';
+  }
+
+  get badgeLabel(): string {
+    switch (this.badgeState) {
+      case 'plateau': return 'Plateau Detected';
+      case 'improving': return 'Improving';
+      case 'insufficient': return 'Insufficient Data';
+    }
   }
 
   get statusMessage(): string {
-    return this.discipline === 'boulder'
+    const message = this.discipline === 'boulder'
       ? this.plateauData.boulderMessage
       : this.plateauData.ropeMessage;
+    return message ?? 'Not enough data to determine plateau yet. Keep climbing!';
   }
 
   private buildChartOptions(yMax: number): ChartOptions<'bar'> {

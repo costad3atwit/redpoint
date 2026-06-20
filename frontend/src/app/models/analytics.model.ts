@@ -3,6 +3,7 @@ export interface AcwrData {
   chronicLoad: number;
   acwrRatio: number;
   overtrainingRisk: boolean;
+  insufficientData: boolean;
 }
 
 export interface PlateauData {
@@ -11,11 +12,13 @@ export interface PlateauData {
   boulderPreviousAverageGrade: number;
   boulderImprovement: number;
   boulderMessage: string;
+  boulderInsufficientData: boolean;
   ropePlateauDetected: boolean;
   ropeRecentAverageGrade: number;
   ropePreviousAverageGrade: number;
   ropeImprovement: number;
   ropeMessage: string;
+  ropeInsufficientData: boolean;
 }
 
 export interface CategoryCounts {

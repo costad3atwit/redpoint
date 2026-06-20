@@ -16,40 +16,46 @@ type AcwrStatus = 'Undertraining' | 'Optimal' | 'Caution' | 'Overtraining Risk';
         <mat-card-subtitle>Training load balance over the last 28 days</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <div class="stats-row">
-          <div class="stat-box">
-            <span class="stat-label">Acute Load</span>
-            <span class="stat-value">{{ data.acuteLoad | number:'1.0-0' }}</span>
-            <span class="stat-sub">7-day avg</span>
+        @if (data.insufficientData) {
+          <div class="insufficient-data">
+            <p>Not enough training history yet. ACWR needs at least 4 weeks of logged sessions to give an accurate ratio — keep logging!</p>
           </div>
-          <div class="stat-box divider">
-            <span class="stat-label">Ratio</span>
-            <span class="stat-value ratio" [class]="statusClass">{{ data.acwrRatio | number:'1.2-2' }}</span>
-            <span class="status-badge" [class]="statusClass">{{ status }}</span>
+        } @else {
+          <div class="stats-row">
+            <div class="stat-box">
+              <span class="stat-label">Acute Load</span>
+              <span class="stat-value">{{ data.acuteLoad | number:'1.0-0' }}</span>
+              <span class="stat-sub">7-day avg</span>
+            </div>
+            <div class="stat-box divider">
+              <span class="stat-label">Ratio</span>
+              <span class="stat-value ratio" [class]="statusClass">{{ data.acwrRatio | number:'1.2-2' }}</span>
+              <span class="status-badge" [class]="statusClass">{{ status }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Chronic Load</span>
+              <span class="stat-value">{{ data.chronicLoad | number:'1.0-0' }}</span>
+              <span class="stat-sub">28-day avg</span>
+            </div>
           </div>
-          <div class="stat-box">
-            <span class="stat-label">Chronic Load</span>
-            <span class="stat-value">{{ data.chronicLoad | number:'1.0-0' }}</span>
-            <span class="stat-sub">28-day avg</span>
-          </div>
-        </div>
 
-        <div class="gauge-container">
-          <div class="gauge-track">
-            <div class="zone zone-under" title="Undertraining (< 0.8)"></div>
-            <div class="zone zone-optimal" title="Optimal (0.8 – 1.3)"></div>
-            <div class="zone zone-caution" title="Caution (1.3 – 1.5)"></div>
-            <div class="zone zone-over" title="Overtraining Risk (> 1.5)"></div>
-            <div class="gauge-marker" [style.left]="markerLeft"></div>
+          <div class="gauge-container">
+            <div class="gauge-track">
+              <div class="zone zone-under" title="Undertraining (< 0.8)"></div>
+              <div class="zone zone-optimal" title="Optimal (0.8 – 1.3)"></div>
+              <div class="zone zone-caution" title="Caution (1.3 – 1.5)"></div>
+              <div class="zone zone-over" title="Overtraining Risk (> 1.5)"></div>
+              <div class="gauge-marker" [style.left]="markerLeft"></div>
+            </div>
+            <div class="gauge-labels">
+              <span>0</span>
+              <span>0.8</span>
+              <span>1.3</span>
+              <span>1.5</span>
+              <span>2.0+</span>
+            </div>
           </div>
-          <div class="gauge-labels">
-            <span>0</span>
-            <span>0.8</span>
-            <span>1.3</span>
-            <span>1.5</span>
-            <span>2.0+</span>
-          </div>
-        </div>
+        }
       </mat-card-content>
     </mat-card>
   `,
@@ -135,6 +141,19 @@ type AcwrStatus = 'Undertraining' | 'Optimal' | 'Caution' | 'Overtraining Risk';
       margin-top: 6px;
       font-size: 0.65rem;
       color: var(--rp-text-muted);
+    }
+
+    .insufficient-data {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 160px;
+      text-align: center;
+      color: var(--rp-text-muted);
+      font-size: 0.875rem;
+      border: 1px dashed var(--rp-border);
+      border-radius: 8px;
+      padding: 16px;
     }
   `],
 })
