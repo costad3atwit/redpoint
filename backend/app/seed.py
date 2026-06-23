@@ -74,7 +74,6 @@ def generate_perfect_climbing_data(num_users: int, months: int):
     db = next(get_db())
     try:
         clean_database(db)
-        print(f"Seeding independent route libraries and cross-session attempts for {num_users} users...")
 
         total_days = months * 30
         print(f"Seeding {months} months of climbing data for {num_users} users ...")
@@ -96,22 +95,20 @@ def generate_perfect_climbing_data(num_users: int, months: int):
             db.add(user)
             db.flush()
 
-            base_sessions_per_month = random.randint(8, 12)
-            num_sessions = base_sessions_per_month * months
-
             session_dates = []
-
-            avg_days_between_sessions = total_days / num_sessions
             current_sim_date = end_date - timedelta(days=total_days)
 
-            for _ in range(num_sessions):
+            while current_sim_date < end_date:
                 current_sim_date += timedelta(days=random.choice([1, 2, 3]))
-                if current_sim_date >= end_date:
-                    current_sim_date = end_date - timedelta(days=1)
+
+                if (current_sim_date) >= end_date:
+                    break
+            
                 session_dates.append(current_sim_date)
 
             session_dates = sorted(session_dates)
-
+            num_sessions = len(session_dates)
+            
             # Route library: routes the user has registered, independent of sessions.
             # Grows over time; unsent routes are tracked separately as "projects."
             route_library: list[Route] = []
