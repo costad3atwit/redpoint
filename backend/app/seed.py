@@ -70,11 +70,14 @@ def _grade_range(discipline: str, user_tier: str, timeline_progress: float) -> t
             return int(11 + (1 * timeline_progress)), int(13 + (1 * timeline_progress))
 
 
-def generate_perfect_climbing_data(num_users: int):
+def generate_perfect_climbing_data(num_users: int, months: int):
     db = next(get_db())
     try:
         clean_database(db)
         print(f"Seeding independent route libraries and cross-session attempts for {num_users} users...")
+
+        total_days = months * 30
+        print(f"Seeding {months} months of climbing data for {num_users} users ...")
 
         shared_password_hash = hash_password("password123")
         end_date = datetime.now(timezone.utc).date()
@@ -88,14 +91,18 @@ def generate_perfect_climbing_data(num_users: int):
                 username=username,
                 email=f"{username}@wit.edu",
                 hashed_password=shared_password_hash,
-                created_at=datetime.now(timezone.utc) - timedelta(days=90)
+                created_at=datetime.now(timezone.utc) - timedelta(days=total_days)
             )
             db.add(user)
             db.flush()
 
-            num_sessions = random.randint(7, 28)
+            base_sessions_per_month = random.randint(8, 12)
+            num_sessions = base_sessions_per_month * months
+
             session_dates = []
-            current_sim_date = end_date - timedelta(days=int(num_sessions * 2.2))
+
+            avg_days_between_sessions = total_days / num_sessions
+            current_sim_date = end_date - timedelta(days=total_days)
 
             for _ in range(num_sessions):
                 current_sim_date += timedelta(days=random.choice([1, 2, 3]))
@@ -214,7 +221,7 @@ def generate_perfect_climbing_data(num_users: int):
                     db.add(attempt_record)
 
         db.commit()
-        print(f"\nSUCCESS: Seeding complete. {num_users} users seeded with independent route libraries and cross-session project attempts.")
+        print(f"\nSUCCESS: Seeding complete. {num_users} users seeded over {months} months of progression.")
     except Exception as e:
         db.rollback()
         print(f"Error during execution: {e}")
@@ -226,5 +233,6 @@ def generate_perfect_climbing_data(num_users: int):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Synchronous analytical seed manager.")
     parser.add_argument("-u", "--users", type=int, default=15, help="Number of dense profiles to build.")
+    parser.add_argument("-m", "--months", type=int, default=3, help="Number of months back to generate data")
     args = parser.parse_args()
-    generate_perfect_climbing_data(num_users=args.users)
+    generate_perfect_climbing_data(num_users=args.users, months=args.months)
