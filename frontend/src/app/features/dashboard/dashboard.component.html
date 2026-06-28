@@ -1,0 +1,120 @@
+<div class="dashboard">
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="48" />
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <p>{{ error() }}</p>
+    </div>
+  } @else if (data(); as d) {
+
+    <!-- Hero: Profile + Stats -->
+    <mat-card class="hero-card">
+      <mat-card-content>
+        <div class="profile-row">
+          <mat-icon class="avatar">account_circle</mat-icon>
+          <div class="profile-info">
+            <h1 class="username">{{ displayName() }}</h1>
+            <p class="since">Member since {{ d.profile.createdAt | date:'MMMM yyyy' }}</p>
+          </div>
+          <a mat-icon-button routerLink="/profile" class="settings-btn" aria-label="Profile settings">
+            <mat-icon>settings</mat-icon>
+          </a>
+        </div>
+
+        <mat-divider class="hero-divider" />
+
+        <div class="stats-strip">
+          <div class="stat-item">
+            <span class="stat-num">{{ d.stats.totalSessions }}</span>
+            <span class="stat-lbl">Sessions</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">{{ d.stats.totalRoutesSent }}</span>
+            <span class="stat-lbl">Sent</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">{{ topBoulderDisplay() }}</span>
+            <span class="stat-lbl">Top Boulder</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">{{ topRopedDisplay() }}</span>
+            <span class="stat-lbl">Top Rope</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Metrics Row: ACWR + Finger Load -->
+    <div class="metrics-row">
+      <rp-acwr-card [data]="d.acwr" [compact]="true" class="metric-acwr" />
+
+      <mat-card class="metric-card finger-card">
+        <mat-card-content>
+          <span class="metric-label">7-Day Avg Finger Load</span>
+          @if (avgFingerLoad() !== null) {
+            <span class="metric-value">{{ avgFingerLoad() | number:'1.1-1' }}<span class="metric-denom">/10</span></span>
+            <span class="metric-sub">{{ recentSessions().length }} session{{ recentSessions().length === 1 ? '' : 's' }} this week</span>
+          } @else {
+            <span class="metric-value metric-empty">—</span>
+            <span class="metric-sub">No sessions in the past 7 days</span>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Week at a Glance -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Week at a Glance</h2>
+        <a mat-button routerLink="/sessions" class="see-all-btn">See All</a>
+      </div>
+
+      @if (recentSessions().length === 0) {
+        <div class="empty-state">
+          <mat-icon>fitness_center</mat-icon>
+          <p>No sessions in the past 7 days.</p>
+          <a mat-flat-button routerLink="/sessions/new">Log a Session</a>
+        </div>
+      } @else {
+        <div class="session-list">
+          @for (session of recentSessions(); track session.id) {
+            <mat-card class="session-card" [routerLink]="['/sessions', session.id]">
+              <mat-card-content>
+                <div class="card-main">
+                  <span class="session-date">{{ session.date | date:'EEE, MMM d' }}</span>
+                  <span class="session-duration">{{ session.durationMinutes }} min</span>
+                </div>
+                <mat-divider />
+                <div class="card-stats">
+                  <div class="stat">
+                    <span class="stat-label">RPE</span>
+                    <span class="stat-value">{{ session.rpe }}/10</span>
+                  </div>
+                  <div class="stat">
+                    <span class="stat-label">Finger Load</span>
+                    <span class="stat-value">{{ session.fingerLoadRating }}/10</span>
+                  </div>
+                  <div class="stat">
+                    <span class="stat-label">Logged</span>
+                    <span class="stat-value">{{ session.routeAttempts.length }}</span>
+                  </div>
+                  <div class="stat">
+                    <span class="stat-label">Sent</span>
+                    <span class="stat-value accent">{{ sentCount(session) }}</span>
+                  </div>
+                </div>
+                @if (session.notes) {
+                  <p class="session-notes">{{ session.notes }}</p>
+                }
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+      }
+    </section>
+
+  }
+</div>

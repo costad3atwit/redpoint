@@ -10,54 +10,73 @@ type AcwrStatus = 'Undertraining' | 'Optimal' | 'Caution' | 'Overtraining Risk';
   standalone: true,
   imports: [CommonModule, MatCardModule],
   template: `
-    <mat-card class="analytics-card">
-      <mat-card-header>
-        <mat-card-title>Acute:Chronic Workload Ratio</mat-card-title>
-        <mat-card-subtitle>Training load balance over the last 28 days</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        @if (data.insufficientData) {
-          <div class="insufficient-data">
-            <p>Not enough training history yet. ACWR needs at least 4 weeks of logged sessions to give an accurate ratio — keep logging!</p>
-          </div>
-        } @else {
-          <div class="stats-row">
-            <div class="stat-box">
-              <span class="stat-label">Acute Load</span>
-              <span class="stat-value">{{ data.acuteLoad | number:'1.0-0' }}</span>
-              <span class="stat-sub">7-day avg</span>
+    @if (compact) {
+      <mat-card class="analytics-card acwr-compact">
+        <mat-card-content>
+          <span class="compact-label">ACWR</span>
+          @if (data.insufficientData) {
+            <div class="compact-body">
+              <span class="compact-ratio">—</span>
+              <span class="compact-sub">Insufficient Data</span>
             </div>
-            <div class="stat-box divider">
-              <span class="stat-label">Ratio</span>
-              <span class="stat-value ratio" [class]="statusClass">{{ data.acwrRatio | number:'1.2-2' }}</span>
+          } @else {
+            <div class="compact-body">
+              <span class="compact-ratio" [class]="statusClass">{{ data.acwrRatio | number:'1.2-2' }}</span>
               <span class="status-badge" [class]="statusClass">{{ status }}</span>
             </div>
-            <div class="stat-box">
-              <span class="stat-label">Chronic Load</span>
-              <span class="stat-value">{{ data.chronicLoad | number:'1.0-0' }}</span>
-              <span class="stat-sub">28-day avg</span>
+          }
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      <mat-card class="analytics-card">
+        <mat-card-header>
+          <mat-card-title>Acute:Chronic Workload Ratio</mat-card-title>
+          <mat-card-subtitle>Training load balance over the last 28 days</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (data.insufficientData) {
+            <div class="insufficient-data">
+              <p>Not enough training history yet. ACWR needs at least 4 weeks of logged sessions to give an accurate ratio — keep logging!</p>
             </div>
-          </div>
+          } @else {
+            <div class="stats-row">
+              <div class="stat-box">
+                <span class="stat-label">Acute Load</span>
+                <span class="stat-value">{{ data.acuteLoad | number:'1.0-0' }}</span>
+                <span class="stat-sub">7-day avg</span>
+              </div>
+              <div class="stat-box divider">
+                <span class="stat-label">Ratio</span>
+                <span class="stat-value ratio" [class]="statusClass">{{ data.acwrRatio | number:'1.2-2' }}</span>
+                <span class="status-badge" [class]="statusClass">{{ status }}</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Chronic Load</span>
+                <span class="stat-value">{{ data.chronicLoad | number:'1.0-0' }}</span>
+                <span class="stat-sub">28-day avg</span>
+              </div>
+            </div>
 
-          <div class="gauge-container">
-            <div class="gauge-track">
-              <div class="zone zone-under" title="Undertraining (< 0.8)"></div>
-              <div class="zone zone-optimal" title="Optimal (0.8 – 1.3)"></div>
-              <div class="zone zone-caution" title="Caution (1.3 – 1.5)"></div>
-              <div class="zone zone-over" title="Overtraining Risk (> 1.5)"></div>
-              <div class="gauge-marker" [style.left]="markerLeft"></div>
+            <div class="gauge-container">
+              <div class="gauge-track">
+                <div class="zone zone-under" title="Undertraining (< 0.8)"></div>
+                <div class="zone zone-optimal" title="Optimal (0.8 – 1.3)"></div>
+                <div class="zone zone-caution" title="Caution (1.3 – 1.5)"></div>
+                <div class="zone zone-over" title="Overtraining Risk (> 1.5)"></div>
+                <div class="gauge-marker" [style.left]="markerLeft"></div>
+              </div>
+              <div class="gauge-labels">
+                <span>0</span>
+                <span>0.5</span>
+                <span>1</span>
+                <span>1.5</span>
+                <span>2.0+</span>
+              </div>
             </div>
-            <div class="gauge-labels">
-              <span>0</span>
-              <span>0.5</span>
-              <span>1</span>
-              <span>1.5</span>
-              <span>2.0+</span>
-            </div>
-          </div>
-        }
-      </mat-card-content>
-    </mat-card>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
   `,
   styles: [`
     .analytics-card {
@@ -155,10 +174,39 @@ type AcwrStatus = 'Undertraining' | 'Optimal' | 'Caution' | 'Overtraining Risk';
       border-radius: 8px;
       padding: 16px;
     }
+
+    .acwr-compact mat-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px !important;
+    }
+    .compact-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--rp-text-muted);
+    }
+    .compact-body {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .compact-ratio {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .compact-sub {
+      font-size: 0.75rem;
+      color: var(--rp-text-muted);
+    }
   `],
 })
 export class AcwrCardComponent {
   @Input({ required: true }) data!: AcwrData;
+  @Input() compact = false;
 
   get status(): AcwrStatus {
     const r = this.data.acwrRatio;
