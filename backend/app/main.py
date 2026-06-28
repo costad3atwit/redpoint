@@ -12,7 +12,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # TODO: add CloudFront domain for production
+    allow_origins=["http://localhost:4200", "https://wit-redpoint.com", "https://www.wit-redpoint.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
