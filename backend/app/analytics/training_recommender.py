@@ -7,7 +7,7 @@ def normalize(value):
     return value.lower().strip()
 
 
-def recommend_training(route_attempts, recent_routes_count=10):
+def recommend_training(route_attempts, recent_routes_count=50):
     recent_attempts = sorted(
         route_attempts,
         key=lambda a: a.session.date,
@@ -38,31 +38,34 @@ def recommend_training(route_attempts, recent_routes_count=10):
 
     for attempt in recent_attempts:
         route = attempt.route
+        weight = attempt.attempts or 1
+
         if route:
             if route.hold_type:
-                ht = normalize(route.hold_type)
-                if ht in hold_type_options:
-                    counters["hold_type"][ht] += 1
+                for hold_type in route.hold_type:
+                    ht = normalize(hold_type)
+                    if ht in hold_type_options:
+                        counters["hold_type"][ht] += weight
 
             if route.style:
                 st = normalize(route.style)
                 if st in style_options:
-                    counters["style"][st] += 1
+                    counters["style"][st] += weight
 
             if route.wall_style:
                 ws = normalize(route.wall_style)
                 if ws in wall_style_options:
-                    counters["wall_style"][ws] += 1
+                    counters["wall_style"][ws] += weight
 
             if route.environment:
                 env = normalize(route.environment)
                 if env in environment_options:
-                    counters["environment"][env] += 1
+                    counters["environment"][env] += weight
 
         if attempt.send_type:
             stype = normalize(attempt.send_type)
             if stype in send_type_options:
-                counters["send_type"][stype] += 1
+                counters["send_type"][stype] += weight
 
     category_counts = {
         category: {option: counters[category].get(option, 0) for option in options}
@@ -82,3 +85,4 @@ def recommend_training(route_attempts, recent_routes_count=10):
         "category_counts": category_counts,
         "recommendation": f"Based on your recent climbs you should focus on {focus}"
     }
+

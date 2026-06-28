@@ -64,22 +64,48 @@ def get_me_stats(db: DBSession = Depends(get_db), current_user=Depends(get_curre
         .all()
     )
 
-    top_grade_sent = "—"
-    if sent_attempts:
-        def grade_key(g: str) -> int:
-            g = g.strip().upper()
-            if g.startswith("V"):
-                try:
-                    return int(g[1:])
-                except ValueError:
-                    pass
+    _YDS_ORDER = [
+        "5.1","5.2","5.3","5.4","5.5","5.6","5.7","5.8","5.9",
+        "5.10a","5.10b","5.10c","5.10d",
+        "5.11a","5.11b","5.11c","5.11d",
+        "5.12a","5.12b","5.12c","5.12d",
+        "5.13a","5.13b","5.13c","5.13d",
+        "5.14a","5.14b","5.14c","5.14d",
+        "5.15a","5.15b","5.15c","5.15d",
+    ]
+
+    def _v_key(g: str) -> int:
+        g = g.strip().upper()
+        if g == "VB":
             return -1
-        top_grade_sent = max((a.route.grade for a in sent_attempts), key=grade_key)
+        if g.startswith("V"):
+            try:
+                return int(g[1:])
+            except ValueError:
+                pass
+        return -999
+
+    def _yds_key(g: str) -> int:
+        g = g.strip().lower()
+        try:
+            return _YDS_ORDER.index(g)
+        except ValueError:
+            for i, yg in enumerate(_YDS_ORDER):
+                if yg.startswith(g):
+                    return i
+            return -1
+
+    boulder_grades = [a.route.grade for a in sent_attempts if a.route.grade.strip().upper().startswith("V")]
+    roped_grades = [a.route.grade for a in sent_attempts if not a.route.grade.strip().upper().startswith("V")]
+
+    top_boulder_grade = max(boulder_grades, key=_v_key) if boulder_grades else "—"
+    top_roped_grade = max(roped_grades, key=_yds_key) if roped_grades else "—"
 
     return {
         "total_sessions": total_sessions,
         "total_routes_sent": len(sent_attempts),
-        "top_grade_sent": top_grade_sent,
+        "top_boulder_grade": top_boulder_grade,
+        "top_roped_grade": top_roped_grade,
     }
 
 @router.patch("/users/me/email", response_model=userResponse)
