@@ -16,35 +16,6 @@
     </mat-card>
   }
 
-  <!-- Stats -->
-  @if (stats(); as s) {
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Your Stats</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-value">{{ s.totalSessions }}</span>
-            <span class="stat-label">Sessions</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ s.totalRoutesSent }}</span>
-            <span class="stat-label">Routes Sent</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ topBoulderDisplay() }}</span>
-            <span class="stat-label">Top Boulder</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ topRopedDisplay() }}</span>
-            <span class="stat-label">Top Roped</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  }
-
   <!-- Account Details -->
   @if (profile(); as p) {
     <mat-card>

@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -140,6 +141,7 @@ import { Session } from '../../../models/session.model';
   `],
 })
 export class SessionDetailComponent implements OnInit {
+  private location = inject(Location);
   private route = inject(ActivatedRoute);
   private sessionService = inject(SessionService);
   private router = inject(Router);
@@ -160,6 +162,6 @@ export class SessionDetailComponent implements OnInit {
   }
 
   back(): void {
-    this.router.navigate(['/sessions']);
+    this.location.back();
   }
 }
