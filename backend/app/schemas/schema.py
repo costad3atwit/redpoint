@@ -25,7 +25,8 @@ class userProfileResponse(userResponse):
 class UserStatsResponse(BaseModel):
     total_sessions: int
     total_routes_sent: int
-    top_grade_sent: str
+    top_boulder_grade: str
+    top_roped_grade: str
 
 class UpdateEmailRequest(BaseModel):
     email: EmailStr
@@ -41,16 +42,15 @@ class routeCreate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     grade: str
-    wall_angle: Optional[str] = None
-    style_tags: Optional[List[str]] = None
     environment: Optional[ClimbingEnvironment] = ClimbingEnvironment.GYM
-    hold_type: Optional[HoldType] = None
+    hold_type: Optional[List[HoldType]] = None
     style: Optional[ClimbingStyle] = None
     wall_style: Optional[WallStyle] = None
 
 class routeResponse(routeCreate):
     id: UUID
     user_id: UUID
+    last_route_length: Optional[int] = None
     class Config:
         from_attributes = True
 

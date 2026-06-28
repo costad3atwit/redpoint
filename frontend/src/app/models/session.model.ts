@@ -4,8 +4,11 @@ export interface Route {
   name?: string;
   description?: string;
   grade: string;
-  wallAngle?: string;
-  styleTags?: string[];
+  style?: string;
+  environment?: string;
+  holdType?: string[];
+  wallStyle?: string;
+  lastRouteLength?: number;
 }
 
 export interface RouteAttempt {
@@ -43,8 +46,10 @@ export interface CreateRoutePayload {
   name?: string;
   description?: string;
   grade: string;
-  wall_angle?: string;
-  style_tags?: string[];
+  style?: string;
+  environment?: string;
+  hold_type?: string[];
+  wall_style?: string;
 }
 
 export interface CreateAttemptPayload {

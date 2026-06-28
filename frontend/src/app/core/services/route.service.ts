@@ -29,8 +29,11 @@ export class RouteService {
       name: r.name,
       description: r.description,
       grade: r.grade,
-      wallAngle: r.wall_angle,
-      styleTags: r.style_tags,
+      style: r.style,
+      environment: r.environment,
+      holdType: r.hold_type,
+      wallStyle: r.wall_style,
+      lastRouteLength: r.last_route_length ?? undefined,
     };
   }
 }

@@ -1,6 +1,6 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session as DBSession
+from sqlalchemy.orm import Session as DBSession, joinedload
 
 from app.database import get_db
 from app.models.routes import Route
@@ -14,7 +14,19 @@ router = APIRouter(
 
 @router.get("/", response_model=list[routeResponse])
 def get_routes(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
-    return db.query(Route).filter(Route.user_id == current_user["user_id"]).all()
+    routes = (
+        db.query(Route)
+        .filter(Route.user_id == current_user["user_id"])
+        .options(joinedload(Route.attempts))
+        .all()
+    )
+    result = []
+    for r in routes:
+        data = routeResponse.model_validate(r).model_dump()
+        lengths = [a.route_length for a in r.attempts if a.route_length is not None]
+        data["last_route_length"] = lengths[0] if lengths else None
+        result.append(data)
+    return result
 
 @router.post("/", response_model=routeResponse)
 def create_route(route_data: routeCreate, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):

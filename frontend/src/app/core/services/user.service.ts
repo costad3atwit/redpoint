@@ -21,7 +21,8 @@ export class UserService {
       map(r => ({
         totalSessions: r.total_sessions,
         totalRoutesSent: r.total_routes_sent,
-        topGradeSent: r.top_grade_sent,
+        topBoulderGrade: r.top_boulder_grade,
+        topRopedGrade: r.top_roped_grade,
       }))
     );
   }

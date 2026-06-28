@@ -8,8 +8,6 @@ import app.models.sessions
 import app.models.routes
 import app.models.attempts
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
 
 app.add_middleware(

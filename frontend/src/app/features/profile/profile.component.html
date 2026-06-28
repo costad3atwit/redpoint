@@ -33,8 +33,12 @@
             <span class="stat-label">Routes Sent</span>
           </div>
           <div class="stat-item">
-            <span class="stat-value">{{ s.topGradeSent }}</span>
-            <span class="stat-label">Top Grade</span>
+            <span class="stat-value">{{ topBoulderDisplay() }}</span>
+            <span class="stat-label">Top Boulder</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ topRopedDisplay() }}</span>
+            <span class="stat-label">Top Roped</span>
           </div>
         </div>
       </mat-card-content>

@@ -10,6 +10,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../core/auth/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { UserProfile, UserStats } from '../../models/user.model';
+import { gradeWithFont } from '../../core/utils/grade-utils';
 import { ChangeEmailDialogComponent } from './change-email-dialog.component';
 import { ChangePasswordDialogComponent } from './change-password-dialog.component';
 import { DeleteAccountDialogComponent } from './delete-account-dialog.component';
@@ -36,6 +37,9 @@ export class ProfileComponent implements OnInit {
     const email = this.profile()?.email;
     return email ? email.split('@')[0] : `User #${user?.user_id}`;
   });
+
+  readonly topBoulderDisplay = computed(() => gradeWithFont(this.stats()?.topBoulderGrade ?? '—'));
+  readonly topRopedDisplay = computed(() => gradeWithFont(this.stats()?.topRopedGrade ?? '—'));
 
   ngOnInit(): void {
     this.userService.getProfile().subscribe(p => this.profile.set(p));
