@@ -9,8 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../core/auth/auth.service';
 import { UserService } from '../../core/services/user.service';
-import { UserProfile, UserStats } from '../../models/user.model';
-import { gradeWithFont } from '../../core/utils/grade-utils';
+import { UserProfile } from '../../models/user.model';
 import { ChangeEmailDialogComponent } from './change-email-dialog.component';
 import { ChangePasswordDialogComponent } from './change-password-dialog.component';
 import { DeleteAccountDialogComponent } from './delete-account-dialog.component';
@@ -29,7 +28,6 @@ export class ProfileComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   readonly profile = signal<UserProfile | null>(null);
-  readonly stats = signal<UserStats | null>(null);
 
   readonly displayName = computed(() => {
     const user = this.auth.currentUser();
@@ -38,12 +36,8 @@ export class ProfileComponent implements OnInit {
     return email ? email.split('@')[0] : `User #${user?.user_id}`;
   });
 
-  readonly topBoulderDisplay = computed(() => gradeWithFont(this.stats()?.topBoulderGrade ?? '—'));
-  readonly topRopedDisplay = computed(() => gradeWithFont(this.stats()?.topRopedGrade ?? '—'));
-
   ngOnInit(): void {
     this.userService.getProfile().subscribe(p => this.profile.set(p));
-    this.userService.getStats().subscribe(s => this.stats.set(s));
   }
 
   openChangeEmail(): void {
