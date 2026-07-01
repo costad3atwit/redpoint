@@ -16,6 +16,9 @@ class userResponse(BaseModel):
     username: str
     email: EmailStr
     created_at: datetime
+    bio: Optional[str] = None
+    home_gym: Optional[str] = None
+    favorited_route_id: Optional[UUID] = None
     class Config:
         from_attributes = True
 
@@ -35,6 +38,11 @@ class UpdateEmailRequest(BaseModel):
 class UpdatePasswordRequest(BaseModel):
     current_password: str
     new_password: str
+
+class ProfileUpdateRequest(BaseModel):
+    bio: Optional[str] = None
+    home_gym: Optional[str] = None
+    favorited_route_id: Optional[UUID] = None
 
 # ── Route (user-owned library) ────────────────────────────────────────────────
 
