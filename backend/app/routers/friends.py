@@ -34,14 +34,13 @@ def send_friend_request(friend_data:FriendRequestCreate, db: DBSession = Depends
 
     return friend_request
 
-@router.get("/requests")
-def get_friend_requests(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+#@router.get("/requests")
+#def get_friend_requests(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
 
 
-@router.post("/accept/{request_id}")
-def accept_friend_request(request_id: UUID, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+#@router.post("/accept/{request_id}")
+#ef accept_friend_request(request_id: UUID, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
 
 
-@router.get("/")
-def get_friends(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
-    
+#@router.get("/")
+#def get_friends(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):

@@ -11,4 +11,4 @@ class FriendRequest(Base):
     sender_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     receiver_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     status = Column(String, default="pending")
-    created_at = Column(DateTime, default=datetime.timezone.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)

@@ -111,10 +111,10 @@ class sessionResponse(BaseModel):
 class FriendRequestCreate(BaseModel):
     username: str
 
-class FriendRequestResponse(BaseModel):
+class FriendRequestReponse(BaseModel):
     id: UUID
     sender_id: UUID
-    receiver_id: UUID
+    reciever_id: UUID
     status: str
     created_at: datetime
     class Config:
