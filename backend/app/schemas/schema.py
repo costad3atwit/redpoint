@@ -97,3 +97,17 @@ class sessionResponse(BaseModel):
     route_attempts: List[routeAttemptResponse] = []
     class Config:
         from_attributes = True
+
+# ── Friends ───────────────────────────────────────────────────────────────────
+
+class FriendRequestCreate(BaseModel):
+    username: str
+
+class FriendRequestReponse(BaseModel):
+    id: UUID
+    sender_id: UUID
+    reciever_id: UUID
+    status: str
+    created_at: datetime
+    class Config:
+        from_attributes = True
