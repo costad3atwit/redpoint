@@ -11,9 +11,7 @@ export class UserService {
   private api = environment.apiUrl;
 
   getProfile(): Observable<UserProfile> {
-    return this.http.get<any>(`${this.api}/users/me`).pipe(
-      map(r => ({ id: r.id, email: r.email, username: r.username, createdAt: r.created_at }))
-    );
+    return this.http.get<any>(`${this.api}/users/me`).pipe(map(r => this.mapProfile(r)));
   }
 
   getStats(): Observable<UserStats> {

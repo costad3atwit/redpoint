@@ -65,6 +65,13 @@
   margin: 0;
 }
 
+.bio {
+  font-size: 0.85rem;
+  color: var(--rp-text-secondary);
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+
 .settings-btn {
   color: var(--rp-text-muted);
   flex-shrink: 0;
@@ -149,6 +156,52 @@
 }
 
 .metric-sub {
+  font-size: 0.75rem;
+  color: var(--rp-text-muted);
+}
+
+// ── Climbing Profile Card ─────────────────────────────────────────────────────
+
+.cp-card mat-card-content {
+  padding: 16px 20px !important;
+}
+
+.cp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.cp-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cp-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--rp-text-muted);
+}
+
+.cp-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.cp-value {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--rp-text-primary);
+}
+
+.cp-sub {
   font-size: 0.75rem;
   color: var(--rp-text-muted);
 }
