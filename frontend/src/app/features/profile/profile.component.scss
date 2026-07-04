@@ -87,6 +87,99 @@
   font-size: 13px;
 }
 
+// ── Climbing Profile inline editing ──────────────────────────────────────────
+
+.detail-row--stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.inline-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.inline-input {
+  width: 100%;
+  background: var(--rp-surface-elevated);
+  border: 1px solid var(--rp-border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  color: var(--rp-text-primary);
+  font-size: 0.9rem;
+  outline: none;
+
+  &:focus { border-color: var(--rp-accent); }
+}
+
+.inline-textarea {
+  @extend .inline-input;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+// Route picker (mirrors session-form styles)
+.route-picker-list {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--rp-border);
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--rp-border);
+  transition: background 0.12s;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: var(--rp-surface-elevated); }
+}
+
+.picker-grade {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  min-width: 36px;
+}
+
+.picker-name {
+  font-size: 0.9rem;
+}
+
+.picker-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--rp-text-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.selected-route {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 4px;
+}
+
+.selected-route-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 // ── Account Actions / Danger Zone ─────────────────────────────────────────────
 
 .danger-card {

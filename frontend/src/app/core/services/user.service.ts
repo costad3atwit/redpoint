@@ -28,7 +28,37 @@ export class UserService {
   updateEmail(newEmail: string, currentPassword: string): Observable<UserProfile> {
     return this.http
       .patch<any>(`${this.api}/users/me/email`, { email: newEmail, current_password: currentPassword })
-      .pipe(map(r => ({ id: r.id, email: r.email, username: r.username, createdAt: r.created_at })));
+      .pipe(map(r => this.mapProfile(r)));
+  }
+
+  updateBio(bio: string | null): Observable<UserProfile> {
+    return this.http
+      .patch<any>(`${this.api}/users/me/bio`, { bio })
+      .pipe(map(r => this.mapProfile(r)));
+  }
+
+  updateHomeGym(homeGym: string | null): Observable<UserProfile> {
+    return this.http
+      .patch<any>(`${this.api}/users/me/home-gym`, { home_gym: homeGym })
+      .pipe(map(r => this.mapProfile(r)));
+  }
+
+  updateFavoritedRoute(routeId: string | null): Observable<UserProfile> {
+    return this.http
+      .patch<any>(`${this.api}/users/me/favorited-route`, { favorited_route_id: routeId })
+      .pipe(map(r => this.mapProfile(r)));
+  }
+
+  private mapProfile(r: any): UserProfile {
+    return {
+      id: r.id,
+      email: r.email,
+      username: r.username,
+      createdAt: r.created_at,
+      bio: r.bio ?? undefined,
+      homeGym: r.home_gym ?? undefined,
+      favoritedRouteId: r.favorited_route_id ?? undefined,
+    };
   }
 
   updatePassword(currentPassword: string, newPassword: string): Observable<void> {
