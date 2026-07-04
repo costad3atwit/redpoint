@@ -10,6 +10,7 @@ from app.models.routes import Route
 from app.schemas.schema import (
     userCreate, userResponse,
     UserStatsResponse, UpdateEmailRequest, UpdatePasswordRequest,
+    UpdateBioRequest, UpdateHomeGymRequest, UpdateFavoritedRouteRequest,
 )
 from app.auth import hash_password, verify_password, create_access_token, get_current_user
 
@@ -127,6 +128,40 @@ def update_password(body: UpdatePasswordRequest, db: DBSession = Depends(get_db)
         raise HTTPException(status_code=400, detail="Invalid password")
     user.hashed_password = hash_password(body.new_password)
     db.commit()
+
+@router.patch("/users/me/bio", response_model=userResponse)
+def update_bio(body: UpdateBioRequest, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    user = db.query(User).filter(User.id == current_user["user_id"]).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.bio = body.bio
+    db.commit()
+    db.refresh(user)
+    return user
+
+@router.patch("/users/me/home-gym", response_model=userResponse)
+def update_home_gym(body: UpdateHomeGymRequest, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    user = db.query(User).filter(User.id == current_user["user_id"]).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.home_gym = body.home_gym
+    db.commit()
+    db.refresh(user)
+    return user
+
+@router.patch("/users/me/favorited-route", response_model=userResponse)
+def update_favorited_route(body: UpdateFavoritedRouteRequest, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    user = db.query(User).filter(User.id == current_user["user_id"]).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if body.favorited_route_id is not None:
+        route = db.query(Route).filter(Route.id == body.favorited_route_id, Route.user_id == user.id).first()
+        if not route:
+            raise HTTPException(status_code=404, detail="Route not found")
+    user.favorited_route_id = body.favorited_route_id
+    db.commit()
+    db.refresh(user)
+    return user
 
 @router.delete("/users/me", status_code=status.HTTP_204_NO_CONTENT)
 def delete_me(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):

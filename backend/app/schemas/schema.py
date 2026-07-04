@@ -39,9 +39,13 @@ class UpdatePasswordRequest(BaseModel):
     current_password: str
     new_password: str
 
-class ProfileUpdateRequest(BaseModel):
+class UpdateBioRequest(BaseModel):
     bio: Optional[str] = None
+
+class UpdateHomeGymRequest(BaseModel):
     home_gym: Optional[str] = None
+
+class UpdateFavoritedRouteRequest(BaseModel):
     favorited_route_id: Optional[UUID] = None
 
 # ── Route (user-owned library) ────────────────────────────────────────────────
