@@ -18,6 +18,9 @@
           <div class="profile-info">
             <h1 class="username">{{ displayName() }}</h1>
             <p class="since">Member since {{ d.profile.createdAt | date:'MMMM yyyy' }}</p>
+            @if (d.profile.bio) {
+              <p class="bio">{{ d.profile.bio }}</p>
+            }
           </div>
           <a mat-icon-button routerLink="/profile" class="settings-btn" aria-label="Profile settings">
             <mat-icon>settings</mat-icon>
@@ -64,6 +67,29 @@
         </mat-card-content>
       </mat-card>
     </div>
+
+    <!-- Climbing Profile -->
+    <mat-card class="cp-card">
+      <mat-card-content>
+        <div class="cp-grid">
+          <div class="cp-item">
+            <div class="cp-label"><mat-icon class="cp-icon">place</mat-icon>Home Gym</div>
+            <span class="cp-value">{{ d.profile.homeGym ?? '—' }}</span>
+          </div>
+          <div class="cp-item">
+            <div class="cp-label"><mat-icon class="cp-icon">star</mat-icon>Favorite Route</div>
+            @if (favoritedRoute()) {
+              <span class="cp-value">{{ favoritedRoute()!.name ?? gradeWithFont(favoritedRoute()!.grade) }}</span>
+              @if (favoritedRoute()!.name) {
+                <span class="cp-sub">{{ gradeWithFont(favoritedRoute()!.grade) }}</span>
+              }
+            } @else {
+              <span class="cp-value">—</span>
+            }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
     <!-- Week at a Glance -->
     <section class="section">

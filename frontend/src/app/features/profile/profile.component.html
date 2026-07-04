@@ -48,6 +48,111 @@
     </mat-card>
   }
 
+  <!-- Climbing Profile -->
+  @if (profile(); as p) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Climbing Profile</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+
+        <!-- Bio -->
+        <div class="detail-row" [class.detail-row--stacked]="editingField() === 'bio'">
+          <div class="detail-info" [class.full-width]="editingField() === 'bio'">
+            <span class="detail-label">Bio</span>
+            @if (editingField() !== 'bio') {
+              <span class="detail-value">{{ p.bio || 'Not set' }}</span>
+            } @else {
+              <textarea class="inline-textarea" [ngModel]="bioInput()" (ngModelChange)="bioInput.set($event)" rows="3" placeholder="Tell other climbers about yourself…"></textarea>
+            }
+          </div>
+          @if (editingField() !== 'bio') {
+            <button mat-stroked-button (click)="startEdit('bio', p.bio)">{{ p.bio ? 'Edit' : 'Set' }}</button>
+          } @else {
+            <div class="inline-actions">
+              <button mat-button (click)="cancelEdit()">Cancel</button>
+              <button mat-flat-button [disabled]="saving()" (click)="saveBio()">Save</button>
+            </div>
+          }
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Home Gym -->
+        <div class="detail-row" [class.detail-row--stacked]="editingField() === 'home-gym'">
+          <div class="detail-info" [class.full-width]="editingField() === 'home-gym'">
+            <span class="detail-label">Home Gym</span>
+            @if (editingField() !== 'home-gym') {
+              <span class="detail-value">{{ p.homeGym || 'Not set' }}</span>
+            } @else {
+              <input class="inline-input" [ngModel]="homeGymInput()" (ngModelChange)="homeGymInput.set($event)" placeholder="e.g. Brooklyn Boulders" />
+            }
+          </div>
+          @if (editingField() !== 'home-gym') {
+            <button mat-stroked-button (click)="startEdit('home-gym', p.homeGym)">{{ p.homeGym ? 'Edit' : 'Set' }}</button>
+          } @else {
+            <div class="inline-actions">
+              <button mat-button (click)="cancelEdit()">Cancel</button>
+              <button mat-flat-button [disabled]="saving()" (click)="saveHomeGym()">Save</button>
+            </div>
+          }
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Favorite Route -->
+        <div class="detail-row" [class.detail-row--stacked]="editingField() === 'favorited-route'">
+          @if (editingField() !== 'favorited-route') {
+            <div class="detail-info">
+              <span class="detail-label">Favorite Route</span>
+              @if (favoritedRoute()) {
+                <span class="detail-value">{{ favoritedRoute()!.grade }}@if (favoritedRoute()!.name) { · {{ favoritedRoute()!.name }}}</span>
+              } @else {
+                <span class="detail-value">Not set</span>
+              }
+            </div>
+            <button mat-stroked-button (click)="startEditRoute()">{{ favoritedRoute() ? 'Change' : 'Set' }}</button>
+          } @else {
+            <div class="detail-info full-width">
+              <span class="detail-label">Favorite Route</span>
+              @if (pendingRoute()) {
+                <div class="selected-route">
+                  <div class="selected-route-info">
+                    <span class="picker-grade">{{ pendingRoute()!.grade }}</span>
+                    <span class="picker-name">{{ pendingRoute()!.name ?? 'Unnamed route' }}</span>
+                  </div>
+                  <button mat-button type="button" (click)="pendingRoute.set(null)">Change</button>
+                </div>
+              } @else {
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>Search routes</mat-label>
+                  <input matInput [ngModel]="routeSearch()" (ngModelChange)="routeSearch.set($event)" placeholder="Name or grade…" />
+                  <mat-icon matIconSuffix>search</mat-icon>
+                </mat-form-field>
+                <div class="route-picker-list">
+                  @if (routeLibrary().length === 0) {
+                    <p class="picker-empty">No routes in your library yet.</p>
+                  }
+                  @for (r of filteredRoutes(); track r.id) {
+                    <div class="picker-item" (click)="pendingRoute.set(r)">
+                      <span class="picker-grade">{{ r.grade }}</span>
+                      <span class="picker-name">{{ r.name ?? 'Unnamed route' }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+            <div class="inline-actions">
+              <button mat-button (click)="cancelEdit()">Cancel</button>
+              <button mat-flat-button [disabled]="saving() || !pendingRoute()" (click)="saveFavoritedRoute()">Save</button>
+            </div>
+          }
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  }
+
   <!-- Security -->
   <mat-card>
     <mat-card-header>

@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 import {
   FormBuilder,
   FormArray,
@@ -412,6 +413,7 @@ export class SessionFormComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
+  private location = inject(Location);
 
   readonly vGrades: GradeOption[] = V_GRADES;
   readonly ydsGrades: GradeOption[] = YDS_GRADES;
@@ -628,8 +630,7 @@ export class SessionFormComponent implements OnInit {
   }
 
   cancel(): void {
-    const id = this.editId();
-    this.router.navigate(id ? ['/sessions', id] : ['/sessions']);
+    this.location.back();
   }
 
   submit(): void {

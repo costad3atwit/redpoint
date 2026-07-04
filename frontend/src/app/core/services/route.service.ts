@@ -16,6 +16,12 @@ export class RouteService {
       .pipe(map(list => list.map(r => this.mapRoute(r))));
   }
 
+  getRoute(id: string): Observable<Route> {
+    return this.http
+      .get<any>(`${this.api}/routes/${id}`)
+      .pipe(map(r => this.mapRoute(r)));
+  }
+
   createRoute(payload: CreateRoutePayload): Observable<Route> {
     return this.http
       .post<any>(`${this.api}/routes/`, payload)

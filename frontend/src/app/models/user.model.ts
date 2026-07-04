@@ -9,6 +9,9 @@ export interface UserProfile {
   email: string;
   username?: string;
   createdAt: string; // ISO date string
+  bio?: string;
+  homeGym?: string;
+  favoritedRouteId?: string;
 }
 
 export interface UserStats {

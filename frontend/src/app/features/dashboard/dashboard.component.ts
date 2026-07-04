@@ -11,10 +11,11 @@ import { AuthService } from '../../core/auth/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { AnalyticsService } from '../../core/services/analytics.service';
 import { SessionService } from '../../core/services/session.service';
+import { RouteService } from '../../core/services/route.service';
 import { AcwrCardComponent } from '../analytics/acwr-card/acwr-card.component';
 import { UserProfile, UserStats } from '../../models/user.model';
 import { AcwrData } from '../../models/analytics.model';
-import { Session } from '../../models/session.model';
+import { Route, Session } from '../../models/session.model';
 import { gradeWithFont } from '../../core/utils/grade-utils';
 
 interface DashboardData {
@@ -45,10 +46,13 @@ export class DashboardComponent implements OnInit {
   private userService = inject(UserService);
   private analyticsService = inject(AnalyticsService);
   private sessionService = inject(SessionService);
+  private routeService = inject(RouteService);
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly data = signal<DashboardData | null>(null);
+  readonly favoritedRoute = signal<Route | null>(null);
+  readonly gradeWithFont = gradeWithFont;
 
   readonly displayName = computed(() => {
     const user = this.auth.currentUser();
@@ -87,6 +91,11 @@ export class DashboardComponent implements OnInit {
       next: result => {
         this.data.set(result);
         this.loading.set(false);
+        if (result.profile.favoritedRouteId) {
+          this.routeService.getRoute(result.profile.favoritedRouteId).subscribe({
+            next: route => this.favoritedRoute.set(route),
+          });
+        }
       },
       error: () => {
         this.error.set('Failed to load dashboard. Please try again.');
