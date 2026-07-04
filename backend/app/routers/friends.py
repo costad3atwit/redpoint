@@ -2,11 +2,13 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session as DBSession
+from sqlalchemy import or_
 
 from app.database import get_db
 from app.auth import get_current_user
 from app.models.users import User
 from app.models.friends import FriendRequest
+from app.models.sessions import Session
 from app.schemas.schema import FriendRequestCreate, FriendRequestReponse
 
 router = APIRouter(prefix = "/friends", tags=["friends"])
@@ -44,3 +46,21 @@ def send_friend_request(friend_data:FriendRequestCreate, db: DBSession = Depends
 
 #@router.get("/")
 #def get_friends(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+
+@router.get("/activity")
+def get_friend_activity(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    user_id = current_user["user_id"]
+
+    friendships = db.query(FriendRequest).filter(FriendRequest.status == "accepted", or_(FriendRequest.sender_id.in_([user_id]), FriendRequest.receiver_id.in_([user_id]))).all()
+
+    friend_ids = []
+
+    for friendship in friendships:
+        if friendship.sender_id == user_id:
+            friend_ids.append(friendship.receiver_id)
+        else:
+            friend_ids.append(friendship.sender_id)
+
+    recent_climbs = db.query(Session).filter(Session.user_id.in_(friend_ids)).order_by(Session.date.desc()).limit(20).all()
+
+    return recent_climbs

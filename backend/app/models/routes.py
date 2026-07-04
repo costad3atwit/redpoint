@@ -55,5 +55,5 @@ class Route(Base):
     style = Column(Enum(ClimbingStyle), nullable=True)
     wall_style = Column(Enum(WallStyle), nullable=True)
 
-    user = relationship("User", back_populates="routes")
+    user = relationship("User", back_populates="routes", foreign_keys=[user_id])
     attempts = relationship("RouteAttempt", back_populates="route", cascade="all, delete-orphan")
