@@ -146,8 +146,10 @@ def search_friends(query: str, db: DBSession = Depends(get_db), current_user=Dep
     return [
         {
             "friend_id": friend.id,
-            "friend_username": friend.username
+            "friend_username": friend.username,
+            "status": "friend" if db.query(FriendRequest).filter(FriendRequest.status == "accepted", or_((FriendRequest.sender_id == user_id) & (FriendRequest.receiver_id == friend.id), (FriendRequest.sender_id == friend.id) & (FriendRequest.receiver_id == user_id))).first() else "not_friend"
         }
         for friend in friends
     ]
+
 
