@@ -25,7 +25,12 @@ def send_friend_request(friend_data:FriendRequestCreate, db: DBSession = Depends
     
     if receiver.id == user_id:
         raise HTTPException(status_code=400, detail="You cannot add yourself as a friend")
+
+    existing_friendship = db.query(FriendRequest).filter(or_((FriendRequest.sender_id == user_id) & (FriendRequest.receiver_id == receiver.id),(FriendRequest.sender_id == receiver.id) & (FriendRequest.receiver_id == user_id)), FriendRequest.status == "accepted").first()
     
+    if existing_friendship:
+        raise HTTPException(status_code=400, detail="You are already friends with this user")
+
     existing_request = db.query(FriendRequest).filter(FriendRequest.sender_id.in_([user_id, receiver.id]), FriendRequest.receiver_id.in_([user_id, receiver.id]), FriendRequest.status.in_(["pending"])).first()
 
     if existing_request:
