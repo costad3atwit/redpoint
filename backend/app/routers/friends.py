@@ -135,3 +135,19 @@ def get_friend_activity(db: DBSession = Depends(get_db), current_user=Depends(ge
         }
         for session, user in recent_climbs
     ]
+
+
+@router.get("/search")
+def search_friends(query: str, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    user_id = UUID(current_user["user_id"])
+
+    friends = (db.query(User).filter(User.id != user_id, User.username.contains(query)).all())
+
+    return [
+        {
+            "friend_id": friend.id,
+            "friend_username": friend.username
+        }
+        for friend in friends
+    ]
+
