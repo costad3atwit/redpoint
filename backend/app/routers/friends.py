@@ -52,8 +52,31 @@ def get_friend_requests(db: DBSession = Depends(get_db), current_user=Depends(ge
         for request, user in requests
     ]
 
-#@router.post("/accept/{request_id}")
-#ef accept_friend_request(request_id: UUID, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+@router.post("/accept/{request_id}")
+def accept_friend_request(request_id: UUID, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    friend_request = db.query(FriendRequest).filter(FriendRequest.id == request_id, FriendRequest.receiver_id == current_user["user_id"], FriendRequest.status == "pending").first()
+
+    if not friend_request:
+        raise HTTPException(status_code=404, detail="Friend request not found")
+    
+    friend_request.status = "accepted"
+    db.commit()
+    db.refresh(friend_request)
+
+    return friend_request
+
+@router.post("/decline/{request_id}")
+def decline_friend_request(request_id: UUID, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    friend_request = db.query(FriendRequest).filter(FriendRequest.id == request_id, FriendRequest.receiver_id == current_user["user_id"], FriendRequest.status == "pending").first()
+
+    if not friend_request:
+        raise HTTPException(status_code=404, detail="Friend request not found")
+    
+    friend_request.status = "declined"
+    db.commit()
+    db.refresh(friend_request)
+
+    return friend_request
 
 
 #@router.get("/")
