@@ -118,7 +118,7 @@ class FriendRequestCreate(BaseModel):
 class FriendRequestReponse(BaseModel):
     id: UUID
     sender_id: UUID
-    reciever_id: UUID
+    receiver_id: UUID
     status: str
     created_at: datetime
     class Config:
