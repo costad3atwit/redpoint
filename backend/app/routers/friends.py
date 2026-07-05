@@ -127,7 +127,11 @@ def get_friend_activity(db: DBSession = Depends(get_db), current_user=Depends(ge
             "friend_username": user.username,
             "session_id": session.id,
             "date": session.date,
-            "message": f"{user.username} completed a session a climb at {session.date}"
+            "duration_minutes": session.duration_minutes,
+            "rpe": session.rpe,
+            "finger_load_rating": session.finger_load_rating,
+            "notes": session.notes,
+            "message": f"{user.username} completed a session at {session.date.strftime('%Y-%m-%d %H:%M:%S')}"
         }
         for session, user in recent_climbs
     ]
