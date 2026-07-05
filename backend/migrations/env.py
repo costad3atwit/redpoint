@@ -26,6 +26,7 @@ from app.database import Base
 import app.models.users
 import app.models.sessions
 import app.models.routes
+import app.models.friends
 
 target_metadata = Base.metadata
 

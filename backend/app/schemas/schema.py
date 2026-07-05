@@ -115,7 +115,7 @@ class sessionResponse(BaseModel):
 class FriendRequestCreate(BaseModel):
     username: str
 
-class FriendRequestReponse(BaseModel):
+class FriendRequestResponse(BaseModel):
     id: UUID
     sender_id: UUID
     receiver_id: UUID

@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
+
 from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import or_
 
@@ -51,16 +52,19 @@ def send_friend_request(friend_data:FriendRequestCreate, db: DBSession = Depends
 def get_friend_activity(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
     user_id = current_user["user_id"]
 
-    friendships = db.query(FriendRequest).filter(FriendRequest.status == "accepted", or_(FriendRequest.sender_id.in_([user_id]), FriendRequest.receiver_id.in_([user_id]))).all()
+    friendships = db.query(FriendRequest).filter(FriendRequest.status == "accepted", or_(FriendRequest.sender_id == user_id, FriendRequest.receiver_id == user_id)).all()
 
-    friend_ids = []
+    friend_ids = [f.receiver_id if f.sender_id == user_id else f.sender_id for f in friendships]
 
-    for friendship in friendships:
-        if friendship.sender_id == user_id:
-            friend_ids.append(friendship.receiver_id)
-        else:
-            friend_ids.append(friendship.sender_id)
+    recent_climbs = (db.query(Session, User).join(User, Session.user_id == User.id).filter(Session.user_id.in_(friend_ids)).order_by(Session.date.desc()).limit(20).all())
 
-    recent_climbs = db.query(Session).filter(Session.user_id.in_(friend_ids)).order_by(Session.date.desc()).limit(20).all()
-
-    return recent_climbs
+    return [
+        {
+            "friend_id": user.id,
+            "friend_username": user.username,
+            "session_id": session.id,
+            "date": session.date,
+            "message": f"{user.username} completed a session a climb at {session.date}"
+        }
+        for session, user in recent_climbs
+    ]
