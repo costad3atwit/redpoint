@@ -37,9 +37,20 @@ def send_friend_request(friend_data:FriendRequestCreate, db: DBSession = Depends
 
     return friend_request
 
-#@router.get("/requests")
-#def get_friend_requests(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+@router.get("/requests")
+def get_friend_requests(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    requests = (db.query(FriendRequest, User).join(User, FriendRequest.sender_id == User.id).filter(FriendRequest.receiver_id == current_user["user_id"], FriendRequest.status == "pending").all())
 
+    return [
+        {
+            "request_id": request.id,
+            "sender_id": request.sender_id,
+            "sender_username": user.username,
+            "status": request.status,
+            "created_at": request.created_at
+        }
+        for request, user in requests
+    ]
 
 #@router.post("/accept/{request_id}")
 #ef accept_friend_request(request_id: UUID, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
