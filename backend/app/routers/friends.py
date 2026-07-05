@@ -119,6 +119,9 @@ def get_friend_activity(db: DBSession = Depends(get_db), current_user=Depends(ge
 
     friend_ids = [f.receiver_id if f.sender_id == user_id else f.sender_id for f in friendships]
 
+    if not friend_ids:
+        return []
+
     recent_climbs = (db.query(Session, User).join(User, Session.user_id == User.id).filter(Session.user_id.in_(friend_ids)).order_by(Session.date.desc()).limit(20).all())
 
     return [
@@ -141,7 +144,7 @@ def get_friend_activity(db: DBSession = Depends(get_db), current_user=Depends(ge
 def search_friends(query: str, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
     user_id = UUID(current_user["user_id"])
 
-    friends = (db.query(User).filter(User.id != user_id, User.username.contains(query)).all())
+    friends = (db.query(User).filter(User.id != user_id, User.username.ilike(f"%{query}%")).all())
 
     return [
         {
