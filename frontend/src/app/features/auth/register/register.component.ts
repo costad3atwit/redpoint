@@ -7,6 +7,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,6 +16,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../../core/auth/auth.service';
 import { environment } from '../../../../environments/environment';
+import { extractErrorMessage } from '../../../core/utils/http-error';
+
+const REGISTER_ERROR_MESSAGES: Record<string, string> = {
+  'Email already registered': 'An account with this email already exists. Try logging in instead.',
+  'Username already taken': 'That username is already taken. Please choose another.',
+};
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
@@ -67,8 +74,13 @@ export class RegisterComponent {
         this.auth.storeToken(token);
         this.router.navigate(['/dashboard']);
       },
-      error: () => {
-        this.snackBar.open('Registration failed. Please try again.', 'Dismiss', { duration: 4000 });
+      error: (err: HttpErrorResponse) => {
+        const message = extractErrorMessage(
+          err,
+          'Registration failed. Please try again.',
+          REGISTER_ERROR_MESSAGES
+        );
+        this.snackBar.open(message, 'Dismiss', { duration: 4000 });
         this.loading.set(false);
       },
       complete: () => this.loading.set(false),
