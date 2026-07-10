@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +10,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../../core/auth/auth.service';
 import { environment } from '../../../../environments/environment';
+import { extractErrorMessage } from '../../../core/utils/http-error';
+
+const LOGIN_ERROR_MESSAGES: Record<string, string> = {
+  'Invalid Credentials': 'Incorrect email or password. Please try again.',
+};
 
 @Component({
   selector: 'rp-login',
@@ -50,8 +56,9 @@ export class LoginComponent {
         this.auth.storeToken(token);
         this.router.navigate(['/dashboard']);
       },
-      error: () => {
-        this.snackBar.open('Login failed. Please try again.', 'Dismiss', { duration: 4000 });
+      error: (err: HttpErrorResponse) => {
+        const message = extractErrorMessage(err, 'Login failed. Please try again.', LOGIN_ERROR_MESSAGES);
+        this.snackBar.open(message, 'Dismiss', { duration: 4000 });
         this.loading.set(false);
       },
       complete: () => this.loading.set(false),
