@@ -44,7 +44,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: DBSession = Depe
         raise HTTPException(status_code=400, detail="Invalid Credentials")
 
     access_token = create_access_token({"user_id": str(user.id), "username": user.username})
-    return {"access_token": access_token, "token_type": "bearer", "username": user.username}
+    return {"access_token": access_token, "token_type": "bearer", "username": user.email}
 
 @router.get("/users/me", response_model=userResponse)
 def get_me(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):

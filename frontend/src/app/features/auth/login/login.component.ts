@@ -13,7 +13,7 @@ import { environment } from '../../../../environments/environment';
 import { extractErrorMessage } from '../../../core/utils/http-error';
 
 const LOGIN_ERROR_MESSAGES: Record<string, string> = {
-  'Invalid Credentials': 'Incorrect email or password. Please try again.',
+  'Invalid Credentials': 'Incorrect email, username or password. Please try again.',
 };
 
 @Component({
@@ -40,7 +40,7 @@ export class LoginComponent {
   readonly loading = signal(false);
 
   form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
+    login: ['', [Validators.required]],
     password: ['', Validators.required],
   });
 
@@ -49,9 +49,9 @@ export class LoginComponent {
     this.form.markAllAsTouched();
 
     this.loading.set(true);
-    const { email, password } = this.form.value;
+    const { login, password } = this.form.value;
 
-    this.auth.login(email!, password!).subscribe({
+    this.auth.login(login!, password!).subscribe({
       next: ({ token }) => {
         this.auth.storeToken(token);
         this.router.navigate(['/dashboard']);
