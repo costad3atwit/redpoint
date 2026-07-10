@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session as DBSession
+from sqlalchemy import or_
 
 from app.database import get_db
 from app.models.users import User
@@ -37,7 +38,8 @@ def register_user(user_data: userCreate, db: DBSession = Depends(get_db)):
 
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: DBSession = Depends(get_db)):
-    user = db.query(User).filter(User.email == form_data.username).first()
+    login_type = form_data.username.strip()
+    user = db.query(User).filter(or_(User.email.ilike(login_type), User.username.ilike(login_type))).first()
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid Credentials")
 
