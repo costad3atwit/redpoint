@@ -7,13 +7,13 @@
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Login</mat-label>
+          <mat-label>Username / Email</mat-label>
           <input matInput type="text" formControlName="login" autocomplete="email" />
           @if (form.get('login')?.hasError('required') && form.get('login')?.touched) {
-            <mat-error>Login is required</mat-error>
+            <mat-error>Username or Email is required</mat-error>
           }
           @if (form.get('login')?.hasError('email') && form.get('login')?.touched) {
-            <mat-error>Invalid email or username</mat-error>
+            <mat-error>Invalid Username or Email</mat-error>
           }
         </mat-form-field>
 
