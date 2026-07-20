@@ -9,15 +9,13 @@ def normalize(value):
 
 def recommend_training(route_attempts, recent_routes_count=50):
     recent_attempts = sorted(
-        route_attempts,
-        key=lambda a: a.session.date,
-        reverse=True
+        route_attempts, key=lambda a: a.session.date, reverse=True
     )[:recent_routes_count]
 
     if not recent_attempts:
         return {
             "recommended_training": None,
-            "recommendation": "Not enough data to provide a training recommendation. Keep climbing!"
+            "recommendation": "Not enough data to provide a training recommendation. Keep climbing!",
         }
 
     hold_type_options = ["crimp", "pinch", "sloper", "pocket", "jug", "sidepull"]
@@ -83,6 +81,5 @@ def recommend_training(route_attempts, recent_routes_count=50):
         "reccomended_training": focus,
         "recommendations": recommendations,
         "category_counts": category_counts,
-        "recommendation": f"Based on your recent climbs you should focus on {focus}"
+        "recommendation": f"Based on your recent climbs you should focus on {focus}",
     }
-

@@ -1,6 +1,7 @@
 from app.models.routes import ClimbingStyle
 
-def boulder_grade_to_int(grade:str):
+
+def boulder_grade_to_int(grade: str):
     grade_mapping = {
         "V0": 0,
         "V1": 1,
@@ -26,6 +27,7 @@ def boulder_grade_to_int(grade:str):
         return None
 
     return grade_mapping.get(grade)
+
 
 def rope_grade_to_int(grade: str):
     grade_mapping = {
@@ -69,11 +71,14 @@ def rope_grade_to_int(grade: str):
 
     return grade_mapping.get(grade)
 
+
 def detect_plateau_single(route_attempts, grade_converter, recent_routes=5):
     sent_attempts = []
 
     for attempt in route_attempts:
-        if not(attempt.sent and attempt.route and attempt.route.grade and attempt.session):
+        if not (
+            attempt.sent and attempt.route and attempt.route.grade and attempt.session
+        ):
             continue
 
         grade_value = grade_converter(attempt.route.grade)
@@ -90,15 +95,17 @@ def detect_plateau_single(route_attempts, grade_converter, recent_routes=5):
             "previous_average_grade": 0,
             "improvement": 0,
             "message": "Not enough data to determine plateau. Keep climbing!",
-            "insufficient_data": True
+            "insufficient_data": True,
         }
 
-    sent_attempts = sorted(sent_attempts, key=lambda item: item[0].session.date, reverse=True)
+    sent_attempts = sorted(
+        sent_attempts, key=lambda item: item[0].session.date, reverse=True
+    )
 
     grade_values = [grade_value for _, grade_value in sent_attempts]
 
     recent_grades = grade_values[:recent_routes]
-    previous_grades = grade_values[recent_routes:recent_routes * 2]
+    previous_grades = grade_values[recent_routes : recent_routes * 2]
 
     recent_avg = sum(recent_grades) / len(recent_grades)
     previous_avg = sum(previous_grades) / len(previous_grades)
@@ -111,18 +118,41 @@ def detect_plateau_single(route_attempts, grade_converter, recent_routes=5):
         "recent_average_grade": round(recent_avg, 2),
         "previous_average_grade": round(previous_avg, 2),
         "improvement": round(improvement, 2),
-        "message": ("No improvement detected. Keep climbing!" if plateau_detected else "Great job you're improving!"),
-        "insufficient_data": False
+        "message": (
+            "No improvement detected. Keep climbing!"
+            if plateau_detected
+            else "Great job you're improving!"
+        ),
+        "insufficient_data": False,
     }
 
+
 def detect_plateau(route_attempts):
-    rope_attempts = [attempt for attempt in route_attempts if attempt.route and attempt.route.style in {ClimbingStyle.TOP_ROPE, ClimbingStyle.SPORT_CLIMBING, ClimbingStyle.TRADITIONAL_CLIMBING}]
+    rope_attempts = [
+        attempt
+        for attempt in route_attempts
+        if attempt.route
+        and attempt.route.style
+        in {
+            ClimbingStyle.TOP_ROPE,
+            ClimbingStyle.SPORT_CLIMBING,
+            ClimbingStyle.TRADITIONAL_CLIMBING,
+        }
+    ]
 
-    boulder_attempts = [attempt for attempt in route_attempts if attempt.route and attempt.route.style == ClimbingStyle.BOULDERING]
+    boulder_attempts = [
+        attempt
+        for attempt in route_attempts
+        if attempt.route and attempt.route.style == ClimbingStyle.BOULDERING
+    ]
 
-    boulder_plateau = detect_plateau_single(boulder_attempts, boulder_grade_to_int, recent_routes=5)
+    boulder_plateau = detect_plateau_single(
+        boulder_attempts, boulder_grade_to_int, recent_routes=5
+    )
 
-    rope_plateau = detect_plateau_single(rope_attempts, rope_grade_to_int, recent_routes=5)
+    rope_plateau = detect_plateau_single(
+        rope_attempts, rope_grade_to_int, recent_routes=5
+    )
 
     return {
         "boulder_plateau_detected": boulder_plateau["plateau_detected"],
@@ -131,7 +161,6 @@ def detect_plateau(route_attempts):
         "boulder_improvement": boulder_plateau["improvement"],
         "boulder_message": boulder_plateau["message"],
         "boulder_insufficient_data": boulder_plateau["insufficient_data"],
-
         "rope_plateau_detected": rope_plateau["plateau_detected"],
         "rope_recent_average_grade": rope_plateau["recent_average_grade"],
         "rope_previous_average_grade": rope_plateau["previous_average_grade"],
