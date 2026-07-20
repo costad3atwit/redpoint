@@ -32,17 +32,25 @@ def _load_attempts_with_context(db: DBSession, user_id: str):
 
 @router.get("/acwr")
 def get_acwr(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
-    sessions = db.query(TrainingSession).filter(TrainingSession.user_id == current_user["user_id"]).all()
+    sessions = (
+        db.query(TrainingSession)
+        .filter(TrainingSession.user_id == current_user["user_id"])
+        .all()
+    )
     return calculate_acwr(sessions, date.today())
 
 
 @router.get("/plateau")
-def get_plateau_detector(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+def get_plateau_detector(
+    db: DBSession = Depends(get_db), current_user=Depends(get_current_user)
+):
     attempts = _load_attempts_with_context(db, current_user["user_id"])
     return detect_plateau(attempts)
 
 
 @router.get("/training")
-def get_training_recommender(db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+def get_training_recommender(
+    db: DBSession = Depends(get_db), current_user=Depends(get_current_user)
+):
     attempts = _load_attempts_with_context(db, current_user["user_id"])
     return recommend_training(attempts)

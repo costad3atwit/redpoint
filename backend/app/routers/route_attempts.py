@@ -10,6 +10,7 @@ from app.auth import get_current_user
 
 router = APIRouter(tags=["route_attempts"])
 
+
 @router.post("/sessions/{session_id}/attempts", response_model=routeAttemptResponse)
 def create_attempt(
     session_id: UUID,
@@ -17,10 +18,14 @@ def create_attempt(
     db: DBSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    session = db.query(TrainingSession).filter(
-        TrainingSession.id == session_id,
-        TrainingSession.user_id == current_user["user_id"],
-    ).first()
+    session = (
+        db.query(TrainingSession)
+        .filter(
+            TrainingSession.id == session_id,
+            TrainingSession.user_id == current_user["user_id"],
+        )
+        .first()
+    )
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
 
@@ -28,21 +33,31 @@ def create_attempt(
     db.add(attempt)
     db.commit()
     db.refresh(attempt)
-    attempt = db.query(RouteAttempt).options(selectinload(RouteAttempt.route)).filter(
-        RouteAttempt.id == attempt.id
-    ).first()
+    attempt = (
+        db.query(RouteAttempt)
+        .options(selectinload(RouteAttempt.route))
+        .filter(RouteAttempt.id == attempt.id)
+        .first()
+    )
     return attempt
 
-@router.get("/sessions/{session_id}/attempts", response_model=list[routeAttemptResponse])
+
+@router.get(
+    "/sessions/{session_id}/attempts", response_model=list[routeAttemptResponse]
+)
 def get_attempts(
     session_id: UUID,
     db: DBSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    session = db.query(TrainingSession).filter(
-        TrainingSession.id == session_id,
-        TrainingSession.user_id == current_user["user_id"],
-    ).first()
+    session = (
+        db.query(TrainingSession)
+        .filter(
+            TrainingSession.id == session_id,
+            TrainingSession.user_id == current_user["user_id"],
+        )
+        .first()
+    )
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     return (
@@ -51,6 +66,7 @@ def get_attempts(
         .filter(RouteAttempt.session_id == session_id)
         .all()
     )
+
 
 @router.put("/attempts/{attempt_id}", response_model=routeAttemptResponse)
 def update_attempt(
@@ -62,7 +78,10 @@ def update_attempt(
     attempt = (
         db.query(RouteAttempt)
         .join(TrainingSession)
-        .filter(RouteAttempt.id == attempt_id, TrainingSession.user_id == current_user["user_id"])
+        .filter(
+            RouteAttempt.id == attempt_id,
+            TrainingSession.user_id == current_user["user_id"],
+        )
         .first()
     )
     if not attempt:
@@ -73,6 +92,7 @@ def update_attempt(
     db.refresh(attempt)
     return attempt
 
+
 @router.delete("/attempts/{attempt_id}", status_code=204)
 def delete_attempt(
     attempt_id: UUID,
@@ -82,7 +102,10 @@ def delete_attempt(
     attempt = (
         db.query(RouteAttempt)
         .join(TrainingSession)
-        .filter(RouteAttempt.id == attempt_id, TrainingSession.user_id == current_user["user_id"])
+        .filter(
+            RouteAttempt.id == attempt_id,
+            TrainingSession.user_id == current_user["user_id"],
+        )
         .first()
     )
     if not attempt:
