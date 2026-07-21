@@ -23,11 +23,9 @@ router = APIRouter(
 # Curated avatar choices. Must stay in sync with PROFILE_ICONS in the
 # frontend (features/profile/profile-icons.ts).
 PROFILE_ICONS = {
-    "terrain",
     "landscape",
     "hiking",
     "forest",
-    "park",
     "fitness_center",
     "sports_gymnastics",
     "self_improvement",
@@ -41,7 +39,12 @@ PROFILE_ICONS = {
     "rocket_launch",
     # Custom SVG icons ('rp-' prefix), served from the frontend's
     # public/icons/<name>.svg
+    "rp-boulder",
     "rp-carabiner",
+    "rp-climber",
+    "rp-handstand",
+    "rp-mountain",
+    "rp-rope",
 }
 
 

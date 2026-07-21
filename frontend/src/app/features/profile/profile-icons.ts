@@ -3,16 +3,19 @@
 // The 'rp-' prefix is how templates know to render via [svgIcon] instead of
 // a Material font ligature.
 export const CUSTOM_PROFILE_ICONS: readonly string[] = [
+  'rp-boulder',
   'rp-carabiner',
+  'rp-climber',
+  'rp-handstand',
+  'rp-mountain',
+  'rp-rope',
 ];
 
 // Material icon (font ligature) avatar choices.
 const MATERIAL_PROFILE_ICONS: readonly string[] = [
-  'terrain',
   'landscape',
   'hiking',
   'forest',
-  'park',
   'fitness_center',
   'sports_gymnastics',
   'self_improvement',
