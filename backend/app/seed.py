@@ -10,7 +10,10 @@ from app.models.sessions import Session as TrainingSession
 from app.models.routes import Route, ClimbingEnvironment, ClimbingStyle, HoldType, WallStyle, SendType
 from app.models.attempts import RouteAttempt
 from app.models.friends import FriendRequest
+from app.routers.users import PROFILE_ICONS
 from app.auth import hash_password
+
+PROFILE_ICON_CHOICES = sorted(PROFILE_ICONS)
 
 DISCIPLINE_STYLE_MAP = {
     "Bouldering": ClimbingStyle.BOULDERING,
@@ -85,7 +88,7 @@ def generate_perfect_climbing_data(num_users: int, months: int):
         seeded_users: list[User] = []
 
         for i in range(num_users):
-            username = f"climber_profile_{i + 1}"
+            username = f"{i + 1}_climber_profile"
             user_tier = random.choices(["beginner", "intermediate", "advanced"], weights=[0.30, 0.55, 0.15])[0]
             preferred_discipline = random.choices(list(DISCIPLINE_STYLE_MAP.keys()), weights=[0.50, 0.25, 0.20, 0.05])[0]
 
@@ -93,6 +96,7 @@ def generate_perfect_climbing_data(num_users: int, months: int):
                 username=username,
                 email=f"{username}@wit.edu",
                 hashed_password=shared_password_hash,
+                profile_icon=random.choice(PROFILE_ICON_CHOICES),
                 created_at=datetime.now(timezone.utc) - timedelta(days=total_days)
             )
             db.add(user)
