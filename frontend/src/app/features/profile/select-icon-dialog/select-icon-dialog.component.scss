@@ -1,0 +1,40 @@
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 8px 0 4px;
+  min-width: 320px;
+}
+
+.icon-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  color: var(--rp-text-muted);
+  transition: border-color 0.15s, color 0.15s;
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  &:hover {
+    color: var(--rp-accent);
+  }
+
+  &.selected {
+    border-color: var(--rp-accent);
+    color: var(--rp-accent);
+  }
+}
+
+.clear-btn {
+  margin-right: auto;
+}

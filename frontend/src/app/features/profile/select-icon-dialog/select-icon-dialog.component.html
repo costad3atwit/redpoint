@@ -1,0 +1,27 @@
+<h2 mat-dialog-title>Choose Profile Icon</h2>
+<mat-dialog-content>
+  <div class="icon-grid">
+    @for (icon of icons; track icon) {
+      <button
+        type="button"
+        class="icon-option"
+        [class.selected]="selected() === icon"
+        (click)="select(icon)"
+        [attr.aria-label]="icon"
+      >
+        @if (isCustomIcon(icon)) {
+          <mat-icon [svgIcon]="icon" />
+        } @else {
+          <mat-icon>{{ icon }}</mat-icon>
+        }
+      </button>
+    }
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  @if (selected()) {
+    <button mat-button class="clear-btn" (click)="clear()">Remove icon</button>
+  }
+  <button mat-stroked-button mat-dialog-close>Cancel</button>
+  <button mat-flat-button [disabled]="!selected()" (click)="save()">Save</button>
+</mat-dialog-actions>

@@ -5,7 +5,27 @@
     <mat-card class="profile-header-card">
       <mat-card-content>
         <div class="header-content">
-          <mat-icon class="profile-avatar">account_circle</mat-icon>
+          <button
+            type="button"
+            class="avatar-button"
+            (click)="openSelectIcon()"
+            aria-label="Change profile icon"
+          >
+            @if (p.profileIcon; as icon) {
+              <span class="avatar-circle">
+                @if (isCustomIcon(icon)) {
+                  <mat-icon [svgIcon]="icon" />
+                } @else {
+                  <mat-icon>{{ icon }}</mat-icon>
+                }
+              </span>
+            } @else {
+              <mat-icon class="profile-avatar">account_circle</mat-icon>
+            }
+            <span class="avatar-badge">
+              <mat-icon>edit</mat-icon>
+            </span>
+          </button>
           <div class="identity">
             <h2 class="display-name">{{ displayName() }}</h2>
             <p class="email">{{ p.email }}</p>

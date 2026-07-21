@@ -16,6 +16,11 @@ import { RouteService } from '../../core/services/route.service';
 import { UserProfile } from '../../models/user.model';
 import { Route } from '../../models/session.model';
 import { ChangeEmailDialogComponent } from './change-email-dialog.component';
+import {
+  SelectIconDialogComponent,
+  SelectIconDialogResult,
+} from './select-icon-dialog/select-icon-dialog.component';
+import { isCustomIcon } from './profile-icons';
 import { ChangePasswordDialogComponent } from './change-password-dialog.component';
 import { DeleteAccountDialogComponent } from './delete-account-dialog.component';
 
@@ -43,6 +48,8 @@ export class ProfileComponent implements OnInit {
   private dialog = inject(MatDialog);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
+
+  readonly isCustomIcon = isCustomIcon;
 
   readonly profile = signal<UserProfile | null>(null);
   readonly favoritedRoute = signal<Route | null>(null);
@@ -154,6 +161,26 @@ export class ProfileComponent implements OnInit {
         this.snackBar.open('Failed to update favorite route', 'Dismiss', { duration: 4000 });
       },
     });
+  }
+
+  openSelectIcon(): void {
+    this.dialog
+      .open(SelectIconDialogComponent, {
+        width: '400px',
+        data: { currentIcon: this.profile()?.profileIcon ?? null },
+      })
+      .afterClosed()
+      .subscribe((result: SelectIconDialogResult | undefined) => {
+        if (result === undefined) return;
+        this.userService.updateProfileIcon(result.icon).subscribe({
+          next: p => {
+            this.profile.set(p);
+            this.snackBar.open('Profile icon updated', 'Dismiss', { duration: 3000 });
+          },
+          error: () =>
+            this.snackBar.open('Failed to update profile icon', 'Dismiss', { duration: 4000 }),
+        });
+      });
   }
 
   openChangeEmail(): void {

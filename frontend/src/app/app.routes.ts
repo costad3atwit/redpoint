@@ -53,6 +53,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'feed',
+        loadComponent: () =>
+          import('./features/friends/friend-feed/friend-feed.component').then(
+            m => m.FriendFeedComponent
+          ),
+      },
+      {
+        path: 'friends',
+        loadComponent: () =>
+          import('./features/friends/friend-manage/friend-manage.component').then(
+            m => m.FriendManageComponent
+          ),
+      },
+      {
         path: 'analytics',
         loadComponent: () =>
           import('./features/analytics/analytics.component').then(m => m.AnalyticsComponent),

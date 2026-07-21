@@ -18,6 +18,7 @@ class userResponse(BaseModel):
     created_at: datetime
     bio: Optional[str] = None
     home_gym: Optional[str] = None
+    profile_icon: Optional[str] = None
     favorited_route_id: Optional[UUID] = None
     class Config:
         from_attributes = True
@@ -47,6 +48,9 @@ class UpdateHomeGymRequest(BaseModel):
 
 class UpdateFavoritedRouteRequest(BaseModel):
     favorited_route_id: Optional[UUID] = None
+
+class UpdateProfileIconRequest(BaseModel):
+    profile_icon: Optional[str] = None
 
 # ── Route (user-owned library) ────────────────────────────────────────────────
 
@@ -123,3 +127,12 @@ class FriendRequestResponse(BaseModel):
     created_at: datetime
     class Config:
         from_attributes = True
+
+class FriendFeedItem(sessionResponse):
+    friend_id: UUID
+    friend_username: str
+    friend_profile_icon: Optional[str] = None
+
+class FriendFeedResponse(BaseModel):
+    items: List[FriendFeedItem] = []
+    next_cursor: Optional[datetime] = None

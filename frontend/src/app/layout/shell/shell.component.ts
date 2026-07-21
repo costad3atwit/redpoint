@@ -11,6 +11,8 @@ const NAV_ITEMS = [
   { label: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
   { label: 'Sessions', route: '/sessions', icon: 'fitness_center' },
   { label: 'Analytics', route: '/analytics', icon: 'bar_chart' },
+  { label: 'Feed', route: '/feed', icon: 'dynamic_feed' },
+  { label: 'Friends', route: '/friends', icon: 'group' },
   { label: 'Profile', route: '/profile', icon: 'person' },
 ] as const;
 

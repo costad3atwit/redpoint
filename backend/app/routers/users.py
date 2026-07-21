@@ -12,12 +12,38 @@ from app.schemas.schema import (
     userCreate, userResponse,
     UserStatsResponse, UpdateEmailRequest, UpdatePasswordRequest,
     UpdateBioRequest, UpdateHomeGymRequest, UpdateFavoritedRouteRequest,
+    UpdateProfileIconRequest,
 )
 from app.auth import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(
     tags=["Authentication"],
 )
+
+# Curated avatar choices. Must stay in sync with PROFILE_ICONS in the
+# frontend (features/profile/profile-icons.ts).
+PROFILE_ICONS = {
+    "terrain",
+    "landscape",
+    "hiking",
+    "forest",
+    "park",
+    "fitness_center",
+    "sports_gymnastics",
+    "self_improvement",
+    "bolt",
+    "local_fire_department",
+    "ac_unit",
+    "wb_sunny",
+    "nights_stay",
+    "pets",
+    "anchor",
+    "rocket_launch",
+    # Custom SVG icons ('rp-' prefix), served from the frontend's
+    # public/icons/<name>.svg
+    "rp-carabiner",
+}
+
 
 @router.post("/register", response_model=userResponse)
 def register_user(user_data: userCreate, db: DBSession = Depends(get_db)):
@@ -147,6 +173,18 @@ def update_home_gym(body: UpdateHomeGymRequest, db: DBSession = Depends(get_db),
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     user.home_gym = body.home_gym
+    db.commit()
+    db.refresh(user)
+    return user
+
+@router.patch("/users/me/profile-icon", response_model=userResponse)
+def update_profile_icon(body: UpdateProfileIconRequest, db: DBSession = Depends(get_db), current_user=Depends(get_current_user)):
+    if body.profile_icon is not None and body.profile_icon not in PROFILE_ICONS:
+        raise HTTPException(status_code=400, detail="Invalid profile icon")
+    user = db.query(User).filter(User.id == current_user["user_id"]).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.profile_icon = body.profile_icon
     db.commit()
     db.refresh(user)
     return user

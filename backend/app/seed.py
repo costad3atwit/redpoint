@@ -9,6 +9,7 @@ from app.models.users import User
 from app.models.sessions import Session as TrainingSession
 from app.models.routes import Route, ClimbingEnvironment, ClimbingStyle, HoldType, WallStyle, SendType
 from app.models.attempts import RouteAttempt
+from app.models.friends import FriendRequest
 from app.auth import hash_password
 
 DISCIPLINE_STYLE_MAP = {
@@ -44,6 +45,7 @@ def clean_database(db: DBSession):
     db.query(RouteAttempt).delete()
     db.query(Route).delete()
     db.query(TrainingSession).delete()
+    db.query(FriendRequest).delete()
     db.query(User).delete()
     db.commit()
 
@@ -80,6 +82,7 @@ def generate_perfect_climbing_data(num_users: int, months: int):
 
         shared_password_hash = hash_password("password123")
         end_date = datetime.now(timezone.utc).date()
+        seeded_users: list[User] = []
 
         for i in range(num_users):
             username = f"climber_profile_{i + 1}"
@@ -94,6 +97,7 @@ def generate_perfect_climbing_data(num_users: int, months: int):
             )
             db.add(user)
             db.flush()
+            seeded_users.append(user)
 
             session_dates = []
             current_sim_date = end_date - timedelta(days=total_days)
@@ -217,8 +221,24 @@ def generate_perfect_climbing_data(num_users: int, months: int):
                     )
                     db.add(attempt_record)
 
+        # Friendships: each user befriends a handful of others so the friend
+        # feed has data out of the box.
+        friend_pairs: set[tuple[uuid.UUID, uuid.UUID]] = set()
+        for user in seeded_users:
+            others = [u for u in seeded_users if u.id != user.id]
+            for friend in random.sample(others, k=min(random.randint(3, 5), len(others))):
+                pair = tuple(sorted((user.id, friend.id)))
+                if pair in friend_pairs:
+                    continue
+                friend_pairs.add(pair)
+                db.add(FriendRequest(
+                    sender_id=user.id,
+                    receiver_id=friend.id,
+                    status="accepted"
+                ))
+
         db.commit()
-        print(f"\nSUCCESS: Seeding complete. {num_users} users seeded over {months} months of progression.")
+        print(f"\nSUCCESS: Seeding complete. {num_users} users seeded over {months} months of progression, {len(friend_pairs)} friendships created.")
     except Exception as e:
         db.rollback()
         print(f"Error during execution: {e}")
