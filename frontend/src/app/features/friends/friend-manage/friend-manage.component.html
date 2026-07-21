@@ -1,0 +1,134 @@
+<div class="friends-page">
+  <header class="friends-header">
+    <h2>Friends</h2>
+  </header>
+
+  @if (requests().length > 0) {
+    <section>
+      <h3>Requests</h3>
+      <mat-card>
+        <mat-card-content>
+          @for (request of requests(); track request.requestId; let last = $last) {
+            <div class="row">
+              <div class="row-left">
+                <div class="avatar-sm" [style.background]="avatarColor(request.senderUsername)">
+                  @if (request.senderProfileIcon; as icon) {
+                    @if (isCustomIcon(icon)) {
+                      <mat-icon [svgIcon]="icon" />
+                    } @else {
+                      <mat-icon>{{ icon }}</mat-icon>
+                    }
+                  } @else {
+                    {{ request.senderUsername.charAt(0).toUpperCase() }}
+                  }
+                </div>
+                <span class="row-name">{{ request.senderUsername }}</span>
+              </div>
+              <div class="row-actions">
+                <button mat-flat-button (click)="accept(request)">Accept</button>
+                <button mat-stroked-button (click)="decline(request)">Decline</button>
+              </div>
+            </div>
+            @if (!last) { <mat-divider /> }
+          }
+        </mat-card-content>
+      </mat-card>
+    </section>
+  }
+
+  <section>
+    <h3>Find climbers</h3>
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search by username</mat-label>
+      <input matInput [formControl]="searchControl" placeholder="e.g. climber_profile_3" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    @if (searchResults(); as results) {
+      @if (results.length === 0 && searchControl.value) {
+        <p class="muted">No climbers found.</p>
+      } @else if (results.length > 0) {
+        <mat-card>
+          <mat-card-content>
+            @for (result of results; track result.friendId; let last = $last) {
+              <div class="row">
+                <div class="row-left">
+                  <div class="avatar-sm" [style.background]="avatarColor(result.friendUsername)">
+                    @if (result.profileIcon; as icon) {
+                      @if (isCustomIcon(icon)) {
+                        <mat-icon [svgIcon]="icon" />
+                      } @else {
+                        <mat-icon>{{ icon }}</mat-icon>
+                      }
+                    } @else {
+                      {{ result.friendUsername.charAt(0).toUpperCase() }}
+                    }
+                  </div>
+                  <span class="row-name">{{ result.friendUsername }}</span>
+                </div>
+                @switch (statusOf(result)) {
+                  @case ('not_friend') {
+                    <button mat-flat-button (click)="addFriend(result)">
+                      <mat-icon>person_add</mat-icon>
+                      Add
+                    </button>
+                  }
+                  @case ('pending') {
+                    <span class="status-tag muted">Pending</span>
+                  }
+                  @case ('friend') {
+                    <span class="status-tag accent">
+                      <mat-icon inline>check</mat-icon> Friends
+                    </span>
+                  }
+                }
+              </div>
+              @if (!last) { <mat-divider /> }
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+    }
+  </section>
+
+  <section>
+    <h3>My friends</h3>
+    @if (loadingFriends()) {
+      <div class="spinner-wrap"><mat-spinner diameter="32" /></div>
+    } @else if (friends().length === 0) {
+      <p class="muted">No friends yet — search for climbers above to get started.</p>
+    } @else {
+      <mat-card>
+        <mat-card-content>
+          @for (friend of friends(); track friend.friendId; let last = $last) {
+            <div class="row">
+              <div class="row-left">
+                <div class="avatar-sm" [style.background]="avatarColor(friend.friendUsername)">
+                  @if (friend.profileIcon; as icon) {
+                    @if (isCustomIcon(icon)) {
+                      <mat-icon [svgIcon]="icon" />
+                    } @else {
+                      <mat-icon>{{ icon }}</mat-icon>
+                    }
+                  } @else {
+                    {{ friend.friendUsername.charAt(0).toUpperCase() }}
+                  }
+                </div>
+                <span class="row-name">{{ friend.friendUsername }}</span>
+              </div>
+              <button
+                mat-icon-button
+                (click)="removeFriend(friend)"
+                aria-label="Remove friend"
+                matTooltip="Remove friend"
+              >
+                <mat-icon>person_remove</mat-icon>
+              </button>
+            </div>
+            @if (!last) { <mat-divider /> }
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+  </section>
+</div>

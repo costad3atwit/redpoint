@@ -43,6 +43,12 @@ export class UserService {
       .pipe(map(r => this.mapProfile(r)));
   }
 
+  updateProfileIcon(icon: string | null): Observable<UserProfile> {
+    return this.http
+      .patch<any>(`${this.api}/users/me/profile-icon`, { profile_icon: icon })
+      .pipe(map(r => this.mapProfile(r)));
+  }
+
   updateFavoritedRoute(routeId: string | null): Observable<UserProfile> {
     return this.http
       .patch<any>(`${this.api}/users/me/favorited-route`, { favorited_route_id: routeId })
@@ -57,6 +63,7 @@ export class UserService {
       createdAt: r.created_at,
       bio: r.bio ?? undefined,
       homeGym: r.home_gym ?? undefined,
+      profileIcon: r.profile_icon ?? undefined,
       favoritedRouteId: r.favorited_route_id ?? undefined,
     };
   }

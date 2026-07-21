@@ -55,7 +55,7 @@ export class SessionService {
     return this.http.delete<void>(`${this.api}/attempts/${attemptId}`);
   }
 
-  private mapSession(s: any): Session {
+  mapSession(s: any): Session {
     return {
       id: s.id,
       userId: s.user_id,

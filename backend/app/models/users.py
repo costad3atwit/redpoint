@@ -15,6 +15,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     bio = Column(Text, nullable=True)
     home_gym = Column(String, nullable=True)
+    profile_icon = Column(String, nullable=True)
     favorited_route_id = Column(UUID(as_uuid=True), ForeignKey("routes.id", ondelete="SET NULL"), nullable=True)
 
     sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan")

@@ -1,0 +1,87 @@
+.friends-page {
+  padding: 24px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.friends-header {
+  margin-bottom: 24px;
+}
+
+section {
+  margin-bottom: 32px;
+}
+
+h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+.search-field {
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  gap: 12px;
+}
+
+.row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.row-name {
+  font-weight: 500;
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+
+.muted {
+  color: var(--rp-text-muted);
+}
+
+.accent {
+  color: var(--rp-accent);
+}
+
+.spinner-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}

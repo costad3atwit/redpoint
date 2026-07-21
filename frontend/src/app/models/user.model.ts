@@ -11,6 +11,7 @@ export interface UserProfile {
   createdAt: string; // ISO date string
   bio?: string;
   homeGym?: string;
+  profileIcon?: string;
   favoritedRouteId?: string;
 }
 

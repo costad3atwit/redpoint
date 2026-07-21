@@ -1,0 +1,92 @@
+<div class="feed-page">
+  <header class="feed-header">
+    <h2>Feed</h2>
+    <a mat-stroked-button routerLink="/friends">
+      <mat-icon>group</mat-icon>
+      Friends
+    </a>
+  </header>
+
+  @if (loading() && items().length === 0) {
+    <div class="spinner-wrap">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (items().length === 0) {
+    <div class="empty-state">
+      <mat-icon>hiking</mat-icon>
+      <p>No activity yet. Add some friends to see their sessions here!</p>
+      <a mat-flat-button routerLink="/friends">Find climbers</a>
+    </div>
+  } @else {
+    <div class="feed-cards">
+      @for (item of items(); track item.id) {
+        <mat-card class="feed-card">
+          <mat-card-content>
+            <div class="card-top">
+              <div class="avatar" [style.background]="avatarColor(item.friendUsername)">
+                @if (item.friendProfileIcon; as icon) {
+                  @if (isCustomIcon(icon)) {
+                    <mat-icon [svgIcon]="icon" />
+                  } @else {
+                    <mat-icon>{{ icon }}</mat-icon>
+                  }
+                } @else {
+                  {{ item.friendUsername.charAt(0).toUpperCase() }}
+                }
+              </div>
+              <div class="who-when">
+                <span class="username">{{ item.friendUsername }}</span>
+                <span class="when">{{ item.date | date: 'EEE, MMM d' }} · {{ item.durationMinutes }} min</span>
+              </div>
+            </div>
+            <mat-divider />
+            <div class="card-stats">
+              <div class="stat">
+                <span class="stat-label">RPE</span>
+                <span class="stat-value">{{ item.rpe }}/10</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">Finger Load</span>
+                <span class="stat-value">{{ item.fingerLoadRating }}/10</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">Routes</span>
+                <span class="stat-value">{{ item.routeAttempts.length }}</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">Sent</span>
+                <span class="stat-value accent">{{ sentCount(item) }}</span>
+              </div>
+            </div>
+            @if (item.routeAttempts.length > 0) {
+              <div class="grade-chips">
+                @for (attempt of item.routeAttempts; track attempt.id) {
+                  <span class="grade-chip" [class.sent]="attempt.sent">
+                    {{ attempt.route.grade }}
+                    @if (attempt.sent) {
+                      <mat-icon inline>check</mat-icon>
+                    }
+                  </span>
+                }
+              </div>
+            }
+            @if (item.notes) {
+              <p class="feed-notes">{{ item.notes }}</p>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+
+  <div #sentinel class="sentinel">
+    @if (loading() && items().length > 0) {
+      <mat-spinner diameter="28" />
+    } @else if (done() && items().length > 0) {
+      <div class="caught-up">
+        <mat-icon>check_circle</mat-icon>
+        <span>You're all caught up</span>
+      </div>
+    }
+  </div>
+</div>
